@@ -10,6 +10,7 @@ public class PlayerMovementInputHandler : MonoBehaviour
 
 
     private Vector2 _mousePosition;
+    private Vector2 _mouseDelta;
 
     public void OnPlayerMove(InputAction.CallbackContext context)
     {
@@ -21,9 +22,20 @@ public class PlayerMovementInputHandler : MonoBehaviour
     {
         _mousePosition = context.ReadValue<Vector2>();
     }
+
+    public void MouseDelta(InputAction.CallbackContext context)
+    {
+        _mouseDelta = context.ReadValue<Vector2>();
+    }
+
     public Vector2 GetMousePosition()
     {
         return _mousePosition;
+    }
+
+    public Vector2 GetMouseDelta()
+    {
+        return _mouseDelta;
     }
 
 }

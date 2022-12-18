@@ -8,19 +8,35 @@ public class PlayerStateManager : MonoBehaviour
     public Rigidbody playerRB;
     public Camera cameraMain;
     public PlayerMovementInputHandler playerMovementInputHandler;
-    [SerializeField] private Transform aimingTarget;
+    public PlayerActionInputHandler playerActionInputHandler;
+    public Transform aimingTarget;
+
+    [Header("Body Components")]
+    public Transform body;
+    public Transform feet;
+    public Transform highPoint;
+    public Transform feetPoint;
+
+    [Header("Check")]
+    public Transform groundCheck;
+    [SerializeField] float groundCheckRadius;
+    public LayerMask whatIsGround;
 
     [Header("Layer Mask")]
-    [SerializeField] LayerMask layerMask;
+    public LayerMask layerMask;
 
     [Header("Movement")]
     public float walkMoveSpeed;
     public float rotationSpeed;
+    public float stepClimbSpeed;
 
+    //Check variable
+    public bool isGround;
+
+    //Private Members
     private StateMachine _stateMachine;
-    
-
     private Vector3 _movementDirection;
+    
 
     //Ground child States
     public IdleState idleState;
@@ -31,10 +47,10 @@ public class PlayerStateManager : MonoBehaviour
     {
         playerRB = GetComponent<Rigidbody>();
         playerMovementInputHandler = GetComponent<PlayerMovementInputHandler>();
+        playerActionInputHandler = GetComponent<PlayerActionInputHandler>();
         cameraMain = Camera.main;
     }
 
-    // Start is called before the first frame update
     private void Start()
     {
         _stateMachine = new StateMachine();
@@ -46,26 +62,26 @@ public class PlayerStateManager : MonoBehaviour
         _stateMachine.Initialize(idleState);
         
     }
-
-    // Update is called once per frame
+    
     private void Update()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = true;
 
-        DrawRay(aimingTarget);
+        BodyRotation();
+        FeetRotation();
 
         MovementDirectionRelatedToCameraDirection();
-        PlayerRotationFollowCamera();
+       
         _stateMachine.LogicalUpdate();
     }
-
+    
     private void FixedUpdate()
     {
+        GroundCheck();
         _stateMachine.PhysicalUpdate();
-        
     }
-
+    
     private void MovementDirectionRelatedToCameraDirection()
     {
         _movementDirection = new Vector3(playerMovementInputHandler.normalizeMovementInput.x, 0f, playerMovementInputHandler.normalizeMovementInput.y);
@@ -73,26 +89,59 @@ public class PlayerStateManager : MonoBehaviour
         _movementDirection.y = 0;
     }
 
+    public void BodyRotation()
+    {
+        Ray ray = cameraMain.ScreenPointToRay(playerMovementInputHandler.GetMousePosition());
+        RaycastHit raycastHit;
+
+        if (Physics.Raycast(ray, out raycastHit, float.MaxValue, layerMask))
+        {
+            Vector3 rotationDirection = raycastHit.point - body.position;
+            Quaternion targetRotation = Quaternion.LookRotation(rotationDirection, Vector3.up);
+
+            body.localRotation = Quaternion.Lerp(body.localRotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+
+    }
+    
+    public void FeetRotation()
+    {
+        Quaternion targetRotation = Quaternion.Euler(0, cameraMain.transform.eulerAngles.y, 0);
+
+        feet.rotation = Quaternion.Lerp(feet.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+    }
+    
+    public void StepClimb()
+    {
+        float stepDistance = Vector3.Distance(highPoint.position, feetPoint.position);
+        Ray stepRay = new Ray(highPoint.position, feetPoint.position - highPoint.position);
+        RaycastHit stepRayHit;
+
+        Debug.Log(stepDistance);
+
+        if(Physics.Raycast(stepRay, out stepRayHit, layerMask))
+        {
+            Debug.DrawRay(highPoint.position, feetPoint.position - highPoint.position);
+            float stepForce = (stepDistance - Vector3.Distance(highPoint.position, stepRayHit.point)) * stepClimbSpeed - playerRB.velocity.y;
+            Vector3 stepForceApply = new Vector3(0, stepForce, 0);
+
+            playerRB.AddForce(stepForceApply, ForceMode.VelocityChange);
+        }
+    }
+    
+    public void GroundCheck()
+    {
+        isGround = Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround);
+    }
+
     public Vector3 GetMovementDirection()
     {
         return this._movementDirection;
     }
 
-    public void PlayerRotationFollowCamera()
-    {
-        float targetAngle = cameraMain.transform.rotation.eulerAngles.y;
-        Quaternion targetRotation = Quaternion.Euler(0, targetAngle, 0);
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-    }
 
-    public void DrawRay(Transform aimingTarget)
+    private void OnDrawGizmos()
     {
-        Ray ray = cameraMain.ScreenPointToRay(playerMovementInputHandler.GetMousePosition());
-        if(Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, layerMask))
-        {
-            Debug.DrawRay(ray.origin, ray.direction, Color.red);
-            aimingTarget.position = Vector3.Lerp(aimingTarget.position, hit.point, 30 * Time.deltaTime);
-            Debug.Log(hit.point);
-        }
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }

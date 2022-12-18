@@ -32,6 +32,7 @@ public class WalkState : GroundState
     {
         base.PhysicalUpdate();
 
+        playerStateManager.StepClimb();
         WalkMove(_movementDirection);
     }
 
