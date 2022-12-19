@@ -5,6 +5,7 @@ using UnityEngine;
 public class GroundState : BaseState
 {
     protected Vector3 _movementDirection;
+    protected bool _isGround;
     public GroundState(StateMachine stateMachine, PlayerStateManager playerStateManager) : base(stateMachine, playerStateManager)
     {
 
@@ -23,11 +24,20 @@ public class GroundState : BaseState
     public override void LogicalUpdate()
     {
         base.LogicalUpdate();
+        _isGround = playerStateManager.isGround;
         _movementDirection = playerStateManager.GetMovementDirection();
+
+        
+
+        if (!_isGround)
+        {
+            stateMachine.ChangeState(playerStateManager.inAirState);
+        }
     }
 
     public override void PhysicalUpdate()
     {
         base.PhysicalUpdate();
+        playerStateManager.FloatingCollider();
     }
 }

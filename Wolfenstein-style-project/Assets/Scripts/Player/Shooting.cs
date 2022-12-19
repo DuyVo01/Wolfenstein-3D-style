@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class Shooting : MonoBehaviour
 {
+    [Header("Cinemachine Impulse")]
+    [SerializeField] CinemachineImpulseSource cameraImpulseSource;
+
     [Header("Bullet")]
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] GameObject bulletSocket;
@@ -23,6 +27,9 @@ public class Shooting : MonoBehaviour
     [Header("Aiming Target")]
     [SerializeField] float swayRadius;
 
+    [Header("Recoil")]
+    public Recoil _recoil;
+
     //Raycast
     private RaycastHit _rayHit;
     private Ray _ray;
@@ -38,6 +45,7 @@ public class Shooting : MonoBehaviour
     private void Awake()
     {
         _playerStateManager = GetComponent<PlayerStateManager>();
+        cameraImpulseSource = GetComponent<CinemachineImpulseSource>();
     }
 
     private void Start()
@@ -65,6 +73,11 @@ public class Shooting : MonoBehaviour
             ShootingBullets();
             lastFire = Time.time;
         }
+        if (!_isShooting)
+        {
+            _recoil.ResetRecoil();
+        }
+        
     }
 
     public void HitPoint()
@@ -93,6 +106,10 @@ public class Shooting : MonoBehaviour
     private void ShootingBullets()
     {
 
+        RecoilOnCameraShake();
+
+        _recoil.RecoilShoot();
+
         if(_bulletToShoot != null)
         {
             _bulletToShoot.transform.position = bulletSocket.transform.position;
@@ -114,5 +131,10 @@ public class Shooting : MonoBehaviour
             }
         }
         return null;
+    }
+
+    private void RecoilOnCameraShake()
+    {
+        cameraImpulseSource.GenerateImpulse(_playerStateManager.cameraMain.transform.forward);
     }
 }

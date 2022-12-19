@@ -37,6 +37,6 @@ public class IdleState : GroundState
     public void DecelerateStop()
     {
         playerStateManager.playerRB.AddForce(new Vector3(-playerStateManager.playerRB.velocity.x * 11, 0, -playerStateManager.playerRB.velocity.z * 11), ForceMode.Acceleration);
-        playerStateManager.playerRB.AddForce(new Vector3(0, -playerStateManager.playerRB.velocity.y, 0), ForceMode.VelocityChange);
+
     }
 }

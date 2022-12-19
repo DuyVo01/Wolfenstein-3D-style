@@ -10,6 +10,7 @@ public class PlayerStateManager : MonoBehaviour
     public PlayerMovementInputHandler playerMovementInputHandler;
     public PlayerActionInputHandler playerActionInputHandler;
     public Transform aimingTarget;
+    public CapsuleCollider playerCapsuleCollider;
 
     [Header("Body Components")]
     public Transform body;
@@ -30,6 +31,12 @@ public class PlayerStateManager : MonoBehaviour
     public float rotationSpeed;
     public float stepClimbSpeed;
 
+    [Header("Floating Collider")]
+    public float floatingDistance;
+
+    [Header("Air Movement")]
+    public float fallMultiplier;
+
     //Check variable
     public bool isGround;
 
@@ -43,11 +50,16 @@ public class PlayerStateManager : MonoBehaviour
     public WalkState walkState;
     public RunState runState;
 
+    //Air State
+    public InAirState inAirState;
+
     private void Awake()
     {
         playerRB = GetComponent<Rigidbody>();
         playerMovementInputHandler = GetComponent<PlayerMovementInputHandler>();
         playerActionInputHandler = GetComponent<PlayerActionInputHandler>();
+        playerCapsuleCollider = GetComponent<CapsuleCollider>();
+
         cameraMain = Camera.main;
     }
 
@@ -58,6 +70,7 @@ public class PlayerStateManager : MonoBehaviour
         idleState = new IdleState(_stateMachine, this);
         walkState = new WalkState(_stateMachine, this);
         runState = new RunState(_stateMachine, this);
+        inAirState = new InAirState(_stateMachine, this);
 
         _stateMachine.Initialize(idleState);
         
@@ -79,6 +92,7 @@ public class PlayerStateManager : MonoBehaviour
     private void FixedUpdate()
     {
         GroundCheck();
+
         _stateMachine.PhysicalUpdate();
     }
     
@@ -117,12 +131,11 @@ public class PlayerStateManager : MonoBehaviour
         Ray stepRay = new Ray(highPoint.position, feetPoint.position - highPoint.position);
         RaycastHit stepRayHit;
 
-        Debug.Log(stepDistance);
-
-        if(Physics.Raycast(stepRay, out stepRayHit, layerMask))
+        if(Physics.Raycast(stepRay, out stepRayHit, stepDistance, layerMask))
         {
             Debug.DrawRay(highPoint.position, feetPoint.position - highPoint.position);
-            float stepForce = (stepDistance - Vector3.Distance(highPoint.position, stepRayHit.point)) * stepClimbSpeed - playerRB.velocity.y;
+            
+            float stepForce = (stepDistance - Vector3.Distance(highPoint.position, stepRayHit.point))/Time.deltaTime - playerRB.velocity.y;
             Vector3 stepForceApply = new Vector3(0, stepForce, 0);
 
             playerRB.AddForce(stepForceApply, ForceMode.VelocityChange);
@@ -139,9 +152,34 @@ public class PlayerStateManager : MonoBehaviour
         return this._movementDirection;
     }
 
-
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+    }
+
+    public void FloatingCollider()
+    {
+        float rideHeight = floatingDistance;
+
+        Ray downRay = new Ray(playerCapsuleCollider.bounds.center, Vector3.down);
+
+        RaycastHit rayFloatHit;
+
+        bool rayDidHit = Physics.Raycast(downRay, out rayFloatHit, rideHeight, whatIsGround);
+
+        if (rayDidHit)
+        {
+
+            Debug.DrawRay(playerCapsuleCollider.bounds.center, downRay.direction * rideHeight, Color.yellow);
+
+            float distanceToLift = playerCapsuleCollider.center.y * transform.localScale.y - rayFloatHit.distance;
+
+            float amountToLift = distanceToLift * 50 - playerRB.velocity.y;
+
+            Vector3 springForce = new Vector3(0f, amountToLift, 0f);
+
+            playerRB.AddForce(springForce, ForceMode.VelocityChange);
+
+        }
     }
 }
