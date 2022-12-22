@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Cinemachine;
 
@@ -13,6 +14,9 @@ public class Shooting : MonoBehaviour
     [SerializeField] GameObject bulletSocket;
     [SerializeField] GameObject bulletPool;
 
+    [Header("Particle Muzzle Flash")]
+    [SerializeField] ParticleSystem muzzleFlashPaticle;
+
     [Header("Gun properties")]
     [SerializeField] int maxBulletHodingCapacity;
     [SerializeField] int totalNumberOfBullet;
@@ -22,7 +26,8 @@ public class Shooting : MonoBehaviour
     [Header("Fire rate")]
     [SerializeField] float bulletSpeed;
     [SerializeField] float fireRate;
-    private float lastFire = 0;
+    [SerializeField] private float recoilCooldown = 0;
+    private float _lastFire = 0;
 
     [Header("Aiming Target")]
     [SerializeField] float swayRadius;
@@ -30,14 +35,18 @@ public class Shooting : MonoBehaviour
     [Header("Recoil")]
     public Recoil _recoil;
 
+    
+
     //Raycast
     private RaycastHit _rayHit;
     private Ray _ray;
 
-
+    //Shoot variables
     private bool _isShooting;
     private GameObject _bulletToShoot;
 
+    public static event Action ShootingBullet;
+    public static event Action ShootingBulletDone;
 
     private PlayerStateManager _playerStateManager;
     private List<GameObject> bullets = new List<GameObject>();
@@ -52,7 +61,7 @@ public class Shooting : MonoBehaviour
     {
         for (int i = 0; i < gunMaxCapacity; i++)
         {
-            GameObject bullet = Instantiate(bulletPrefab, bulletPool.transform);
+            GameObject bullet = Instantiate(bulletPrefab, bulletSocket.transform.position, bulletPrefab.transform.rotation, bulletPool.transform);
             bullet.SetActive(false);
             bullets.Add(bullet);
         }
@@ -63,21 +72,31 @@ public class Shooting : MonoBehaviour
     {
         _isShooting = _playerStateManager.playerActionInputHandler.GetShootInput();
         _bulletToShoot = BulletToShoot();
+        
+
     }
 
     private void FixedUpdate()
     {
-        if (_isShooting && Time.time > lastFire + fireRate)
+
+        if (_isShooting && Time.time > _lastFire + fireRate)
         {
+            ShootingBullet?.Invoke();
             HitPoint();
             ShootingBullets();
-            lastFire = Time.time;
+
+            _lastFire = Time.time;
         }
-        if (!_isShooting)
+        else
         {
+            ShootingBulletDone?.Invoke();
+        }
+
+        if (Time.time > _lastFire + recoilCooldown)
+        {
+
             _recoil.ResetRecoil();
         }
-        
     }
 
     public void HitPoint()
@@ -86,8 +105,8 @@ public class Shooting : MonoBehaviour
 
         Vector2 rayToCast = mousePosition;
 
-        rayToCast.x += Random.Range(-swayRadius, swayRadius);
-        rayToCast.y += Random.Range(-swayRadius, swayRadius);
+        rayToCast.x += UnityEngine.Random.Range(-swayRadius, swayRadius);
+        rayToCast.y += UnityEngine.Random.Range(-swayRadius, swayRadius);
 
         if (Vector3.Distance(rayToCast, mousePosition) > swayRadius)
         {
@@ -98,24 +117,26 @@ public class Shooting : MonoBehaviour
 
         if (Physics.Raycast(_ray, out _rayHit, float.MaxValue, _playerStateManager.layerMask))
         {
-            //aimingTarget.position = Vector3.Lerp(aimingTarget.position, _rayHit.point, Time.deltaTime * 50f);
             _playerStateManager.aimingTarget.position = _rayHit.point;
         }
     }
 
     private void ShootingBullets()
     {
-
+        
         RecoilOnCameraShake();
 
         _recoil.RecoilShoot();
 
         if(_bulletToShoot != null)
         {
+            _bulletToShoot.GetComponent<Rigidbody>().velocity = Vector3.zero;
             _bulletToShoot.transform.position = bulletSocket.transform.position;
             _bulletToShoot.transform.rotation = bulletSocket.transform.rotation;
             _bulletToShoot.SetActive(true);
             _bulletToShoot.GetComponent<Rigidbody>().AddForce(Time.deltaTime * bulletSpeed * (_playerStateManager.aimingTarget.position - _bulletToShoot.transform.position).normalized - _bulletToShoot.GetComponent<Rigidbody>().velocity, ForceMode.VelocityChange);
+
+            muzzleFlashPaticle.Play();
         }
         
 

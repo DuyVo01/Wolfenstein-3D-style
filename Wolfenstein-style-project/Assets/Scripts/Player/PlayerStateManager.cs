@@ -105,19 +105,23 @@ public class PlayerStateManager : MonoBehaviour
 
     public void BodyRotation()
     {
-        Ray ray = cameraMain.ScreenPointToRay(playerMovementInputHandler.GetMousePosition());
-        RaycastHit raycastHit;
+        //Ray ray = cameraMain.ScreenPointToRay(playerMovementInputHandler.GetMousePosition());
+        //RaycastHit raycastHit;
 
-        if (Physics.Raycast(ray, out raycastHit, float.MaxValue, layerMask))
-        {
-            Vector3 rotationDirection = raycastHit.point - body.position;
-            Quaternion targetRotation = Quaternion.LookRotation(rotationDirection, Vector3.up);
+        //if (Physics.Raycast(ray, out raycastHit, float.MaxValue, layerMask))
+        //{
+        //    Vector3 rotationDirection = raycastHit.point - body.position;
+        //    Quaternion targetRotation = Quaternion.LookRotation(rotationDirection, Vector3.up);
 
-            body.localRotation = Quaternion.Lerp(body.localRotation, targetRotation, rotationSpeed * Time.deltaTime);
-        }
+        //    body.localRotation = Quaternion.Lerp(body.localRotation, targetRotation, rotationSpeed * Time.deltaTime);
+        //}
+
+        Quaternion targetRotation = Quaternion.Euler(cameraMain.transform.eulerAngles);
+
+        body.rotation = Quaternion.Lerp(body.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
     }
-    
+
     public void FeetRotation()
     {
         Quaternion targetRotation = Quaternion.Euler(0, cameraMain.transform.eulerAngles.y, 0);
@@ -147,16 +151,6 @@ public class PlayerStateManager : MonoBehaviour
         isGround = Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround);
     }
 
-    public Vector3 GetMovementDirection()
-    {
-        return this._movementDirection;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
-    }
-
     public void FloatingCollider()
     {
         float rideHeight = floatingDistance;
@@ -180,6 +174,18 @@ public class PlayerStateManager : MonoBehaviour
 
             playerRB.AddForce(springForce, ForceMode.VelocityChange);
 
+            
         }
+
+        
+    }
+    public Vector3 GetMovementDirection()
+    {
+        return this._movementDirection;
+    }
+    
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
     }
 }

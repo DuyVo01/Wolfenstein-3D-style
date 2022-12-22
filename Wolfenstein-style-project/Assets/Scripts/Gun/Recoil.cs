@@ -40,31 +40,43 @@ public class Recoil : MonoBehaviour
 
     public void RecoilShoot()
     {
-        float recoilX = _recoilX * Time.deltaTime * _recoilSnappiness;
-        float recoilY = _recoilY * Time.deltaTime * _recoilSnappiness;
+        float recoilX = _recoilX * Time.deltaTime;
+        float recoilY = _recoilY * Time.deltaTime;
 
         recoilX = Random.Range(-recoilX, recoilX);
         recoilY = Random.Range(0, recoilY);
 
-        _virtualPOV.m_HorizontalAxis.Value -= recoilX;
-        _virtualPOV.m_VerticalAxis.Value -= recoilY;
+        //_virtualPOV.m_HorizontalAxis.Value -= recoilX * _recoilSnappiness;
+        //_virtualPOV.m_VerticalAxis.Value -= recoilY * _recoilSnappiness;
 
-        _totalRecoilAmountX += recoilX;
-        _totalRecoilAmountY += recoilY;
+        _virtualPOV.m_HorizontalAxis.Value = Mathf.Lerp(_virtualPOV.m_HorizontalAxis.Value, _virtualPOV.m_HorizontalAxis.Value - recoilX, _recoilSnappiness);
+        _virtualPOV.m_VerticalAxis.Value = Mathf.Lerp(_virtualPOV.m_VerticalAxis.Value, _virtualPOV.m_VerticalAxis.Value - recoilY, _recoilSnappiness);
+
+        //_totalRecoilAmountX += recoilX * _recoilSnappiness;
+        //_totalRecoilAmountY += recoilY * _recoilSnappiness;
+
+        _totalRecoilAmountX = Mathf.Lerp(_totalRecoilAmountX, _totalRecoilAmountX + recoilX, _recoilSnappiness);
+        _totalRecoilAmountY = Mathf.Lerp(_totalRecoilAmountY, _totalRecoilAmountY + recoilY, _recoilSnappiness);
     }
 
     public void ResetRecoil()
     {
         if (_totalRecoilAmountY > 0)
         {
-            _virtualPOV.m_VerticalAxis.Value += _recoilY * Time.deltaTime * _recoilReturnSpeed;
-            _totalRecoilAmountY -= _recoilY * Time.deltaTime * _recoilReturnSpeed;
+            //_virtualPOV.m_VerticalAxis.Value += _recoilY * Time.deltaTime * _recoilReturnSpeed;
+            //_totalRecoilAmountY -= _recoilY * Time.deltaTime * _recoilReturnSpeed;
+
+            _virtualPOV.m_VerticalAxis.Value = Mathf.Lerp(_virtualPOV.m_VerticalAxis.Value, _virtualPOV.m_VerticalAxis.Value + _totalRecoilAmountY, Time.deltaTime * _recoilReturnSpeed);
+            _totalRecoilAmountY = Mathf.Lerp(_totalRecoilAmountY, 0, Time.deltaTime * _recoilReturnSpeed);
         }
 
         if(_totalRecoilAmountX > 0)
         {
-            _virtualPOV.m_HorizontalAxis.Value += _recoilX * Time.deltaTime * _recoilReturnSpeed;
-            _totalRecoilAmountX -= _recoilX * Time.deltaTime * _recoilReturnSpeed;
+            //_virtualPOV.m_HorizontalAxis.Value += _recoilX * Time.deltaTime * _recoilReturnSpeed;
+            //_totalRecoilAmountX -= _recoilX * Time.deltaTime * _recoilReturnSpeed;
+
+            _virtualPOV.m_HorizontalAxis.Value = Mathf.Lerp(_virtualPOV.m_HorizontalAxis.Value, _virtualPOV.m_HorizontalAxis.Value + _totalRecoilAmountX, Time.deltaTime * _recoilReturnSpeed);
+            _totalRecoilAmountX = Mathf.Lerp(_totalRecoilAmountX, 0, Time.deltaTime * _recoilReturnSpeed);
         }
     }
 

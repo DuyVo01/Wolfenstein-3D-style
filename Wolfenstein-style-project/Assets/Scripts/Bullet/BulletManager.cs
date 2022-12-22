@@ -4,8 +4,44 @@ using UnityEngine;
 
 public class BulletManager : MonoBehaviour
 {
-    private void OnCollisionEnter(Collision collision)
+    Vector3 _previousPosition;
+    [SerializeField] LayerMask _layerToCollide;
+    [SerializeField] ParticleSystem bulletImpact;
+
+    TrailRenderer _trailRenderer;
+    private void Awake()
     {
-        gameObject.SetActive(false);
+        _trailRenderer = GetComponent<TrailRenderer>();
     }
+
+    private void Start()
+    {
+        
+    }
+
+    private void Update()
+    {
+        Ray ray = new Ray(_previousPosition, (transform.position - _previousPosition).normalized);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, Vector3.Distance(_previousPosition, transform.position), _layerToCollide))
+        {
+            gameObject.SetActive(false);
+            Instantiate(bulletImpact, hit.point, bulletImpact.transform.rotation);
+        }
+
+        _previousPosition = transform.position;
+    }
+
+    private void FixedUpdate()
+    {
+        
+    }
+
+    private void OnEnable()
+    {
+        _previousPosition = transform.position;
+        _trailRenderer.Clear();
+    }
+
+
 }
