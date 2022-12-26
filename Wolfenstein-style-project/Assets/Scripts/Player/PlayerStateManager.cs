@@ -174,7 +174,6 @@ public class PlayerStateManager : MonoBehaviour
 
             playerRB.AddForce(springForce, ForceMode.VelocityChange);
 
-            
         }
 
         

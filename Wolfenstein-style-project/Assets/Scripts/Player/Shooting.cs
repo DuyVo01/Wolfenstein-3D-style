@@ -71,9 +71,6 @@ public class Shooting : MonoBehaviour
     void Update()
     {
         _isShooting = _playerStateManager.playerActionInputHandler.GetShootInput();
-        _bulletToShoot = BulletToShoot();
-        
-
     }
 
     private void FixedUpdate()
@@ -128,7 +125,9 @@ public class Shooting : MonoBehaviour
 
         _recoil.RecoilShoot();
 
-        if(_bulletToShoot != null)
+        _bulletToShoot = BulletToShoot();
+
+        if (_bulletToShoot != null)
         {
             _bulletToShoot.GetComponent<Rigidbody>().velocity = Vector3.zero;
             _bulletToShoot.transform.position = bulletSocket.transform.position;
