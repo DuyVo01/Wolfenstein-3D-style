@@ -1,4 +1,11 @@
 # Wolfenstein-3D-style
+Changelogs 29/12/2022
+  - Improved enemy AI behaviour, added more states to enemy state machine for different behaviour such as: patrolling, searching, shooting, stationary.
+  - Patrolling: Enemy will move in a fixed set of points, this can be customized.
+  - Searching: Enemy will search for player if not detecing player anymore, then return to patrol state after a fixed duration.
+  - Shooting; Enemy will shoot at player if detecting. At the momment, this is the only state to have animation.
+  - Stationary: Eneny will stand at one point while patroling before moving to next point.
+
 Changelogs 26/12/2022
   - Added basic enemy AI behaviour, managed using state machine pattern.
   - Current enemy behaviour includes:
