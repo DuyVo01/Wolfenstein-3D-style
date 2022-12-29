@@ -14,7 +14,7 @@ public class Detection_Test : MonoBehaviour
     public bool isDetectingPlayer;
 
     Collider[] _inRangeColliders;
-    public Vector3 targetPlayer;
+    public Vector3 targetPlayerPosition;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,12 +39,13 @@ public class Detection_Test : MonoBehaviour
             {
                 if (_inRangeColliders[i].CompareTag("PlayerHurtbox"))
                 {
-                    targetPlayer = _inRangeColliders[i].transform.position;
+                    targetPlayerPosition = _inRangeColliders[i].transform.position;
                     break;
                 }
             }
 
-            Vector3 direction = (targetPlayer - transform.position).normalized;
+            Vector3 direction = (targetPlayerPosition - transform.position).normalized;
+            direction.y = 0;
             float angle = Vector3.Angle(transform.forward, direction);
             if (_inRangeAngle/2 > angle)
             {
@@ -53,7 +54,7 @@ public class Detection_Test : MonoBehaviour
             }
             else
             {
-                if (Vector3.Distance(transform.position, targetPlayer) <= _detectionRangeFromBehind)
+                if (Vector3.Distance(transform.position, targetPlayerPosition) <= _detectionRangeFromBehind)
                 {
                     CheckForPlayerDetection(direction);
                 }
@@ -71,10 +72,9 @@ public class Detection_Test : MonoBehaviour
     {
         Ray rayToPlayer = new Ray(transform.position, direction);
 
-        if (Physics.Raycast(rayToPlayer, out RaycastHit hit, Vector3.Distance(transform.position, targetPlayer), _RaycastCheckLayers))
+        if (Physics.Raycast(rayToPlayer, out RaycastHit hit, Vector3.Distance(transform.position, targetPlayerPosition), _RaycastCheckLayers))
         {
             Debug.DrawLine(transform.position, hit.point);
-            Debug.Log(hit.collider.tag);
             if (hit.collider.CompareTag("PlayerHurtbox"))
             {
                 isDetectingPlayer = true;
@@ -86,11 +86,6 @@ public class Detection_Test : MonoBehaviour
         }
         
 
-    }
-
-    private void CheckForPlayerDetectionFromBehind()
-    {
-        
     }
 
     private void OnDrawGizmos()

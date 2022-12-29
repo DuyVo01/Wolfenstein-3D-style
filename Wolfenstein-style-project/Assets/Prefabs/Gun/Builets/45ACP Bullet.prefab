@@ -68,7 +68,7 @@ MonoBehaviour:
   _layerToCollide:
     serializedVersion: 2
     m_Bits: 384
-  bulletImpact: {fileID: 19800002, guid: 23f99930034a9524197e7f5979042663, type: 3}
+  bulletImpact: {fileID: 1596561165271968373, guid: e94915ff5280cf44792dbe97596e372b, type: 3}
 --- !u!65 &1628429493331110532
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -136,6 +136,15 @@ TrailRenderer:
         value: 1
         inSlope: 0
         outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.5847439
+        value: 0.62744164
+        inSlope: -1.4934766
+        outSlope: -1.4934766
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334

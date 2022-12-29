@@ -15,6 +15,7 @@ public class EnemyIdleState : BaseEnemyState
     public override void Enter()
     {
         base.Enter();
+        enemyStateManager.agent.SetDestination(new Vector3(0, enemyStateManager.transform.position.y, 0));
         recognitionStartTime = enemyStateManager.recognitionTime;
         recognitionTime = recognitionStartTime;
         Debug.Log("Enemy Idle Enter");
@@ -38,7 +39,7 @@ public class EnemyIdleState : BaseEnemyState
             {
                 stateMachine.ChangeState(enemyStateManager.enemyShootingState);
             }
-            
+
         }
     }
 

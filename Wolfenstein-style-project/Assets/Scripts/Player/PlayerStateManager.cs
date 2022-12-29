@@ -49,6 +49,7 @@ public class PlayerStateManager : MonoBehaviour
     public IdleState idleState;
     public WalkState walkState;
     public RunState runState;
+    
 
     //Air State
     public InAirState inAirState;
@@ -119,7 +120,6 @@ public class PlayerStateManager : MonoBehaviour
         Quaternion targetRotation = Quaternion.Euler(cameraMain.transform.eulerAngles);
 
         body.rotation = Quaternion.Lerp(body.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-
     }
 
     public void FeetRotation()
@@ -150,7 +150,7 @@ public class PlayerStateManager : MonoBehaviour
     {
         isGround = Physics.CheckSphere(groundCheck.position, groundCheckRadius, whatIsGround);
     }
-
+   
     public void FloatingCollider()
     {
         float rideHeight = floatingDistance;
@@ -168,7 +168,7 @@ public class PlayerStateManager : MonoBehaviour
 
             float distanceToLift = playerCapsuleCollider.center.y * transform.localScale.y - rayFloatHit.distance;
 
-            float amountToLift = distanceToLift * 50 - playerRB.velocity.y;
+            float amountToLift = distanceToLift * 10 - playerRB.velocity.y;
 
             Vector3 springForce = new Vector3(0f, amountToLift, 0f);
 
@@ -178,6 +178,7 @@ public class PlayerStateManager : MonoBehaviour
 
         
     }
+    
     public Vector3 GetMovementDirection()
     {
         return this._movementDirection;

@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyStateManager : MonoBehaviour
 {
-    [Header("Enemy Idle State")]
-    public float recognitionTime;
+    [Header("Navmesh Agent")]
+    public NavMeshAgent agent;
+    [Header("Animator")]
+    public Animator enemyAnimator;
 
     [Space(10)] 
     [Header("Enemy Shooting State")]
@@ -18,43 +21,60 @@ public class EnemyStateManager : MonoBehaviour
     public int enemyBulletCapacity;
     public float shootingStartTime;
     public float shootingDelayedTime;
+    public Vector3 lastKnownTargetPosition;
+
+    [Space(10)]
+    [Header("Enemy Searching State")]
+    public float searchingTime;
+
+    [Space(10)]
+    [Header("Enemy Patrol State")]
+    public EnemyPatrolPointsData patrolPointsData;
+    public float recognitionTime;
+    public float patrolLookingTime;
 
 
     [Space(10)]
     [SerializeField] float rotatonSpeed;
     private EnemyStateMachine _stateMachine;
 
-    private Rigidbody _enemyRB;
+    public Rigidbody enemyRB;
     private Detection_Test _detection;
 
-    public EnemyIdleState enemyIdleState;
+    //States
     public EnemyShootingState enemyShootingState;
+    public EnemySearchingState enemySearchingState;
+    public EnemyPatrolState enemyPatrolState;
 
     public bool isDetectingPlayer;
-    public Vector3 targetPlayer;
+    public Vector3 targetPosition;
 
     private void Awake()
     {
-        _enemyRB = GetComponent<Rigidbody>();
+        enemyRB = GetComponent<Rigidbody>();
         _detection = GetComponent<Detection_Test>();
+        agent = GetComponent<NavMeshAgent>();
+        patrolPointsData = GetComponent<EnemyPatrolPointsData>();
     }
     // Start is called before the first frame update
     void Start()
     {
         _stateMachine = new EnemyStateMachine();
 
-        enemyIdleState = new EnemyIdleState(_stateMachine, this);
         enemyShootingState = new EnemyShootingState(_stateMachine, this);
+        enemySearchingState = new EnemySearchingState(_stateMachine, this, searchingTime);
+        enemyPatrolState = new EnemyPatrolState(_stateMachine, this, patrolPointsData.patrolPoints);
 
-        _stateMachine.Initialize(enemyIdleState);
+        _stateMachine.Initialize(enemyPatrolState);
     }
 
     // Update is called once per frame
     void Update()
     {
         isDetectingPlayer = _detection.isDetectingPlayer;
-        targetPlayer = _detection.targetPlayer;
+        targetPosition = _detection.targetPlayerPosition;
         _stateMachine.LogicalUpdate();
+        
     }
 
     private void FixedUpdate()
@@ -64,15 +84,15 @@ public class EnemyStateManager : MonoBehaviour
 
     public void RotateToTarget()
     {
-        Vector3 targetDirection = _detection.targetPlayer - transform.position;
+        Vector3 targetDirection = _detection.targetPlayerPosition - transform.position;
         Quaternion lookToTarget = Quaternion.LookRotation(targetDirection);
 
-        _enemyRB.rotation = Quaternion.Lerp(_enemyRB.rotation, lookToTarget, Time.deltaTime * rotatonSpeed);
+        enemyRB.MoveRotation(Quaternion.Lerp(enemyRB.rotation, lookToTarget, Time.deltaTime * rotatonSpeed));
     }
 
     public Vector3 EnemyVelocity()
     {
-        return _enemyRB.velocity;
+        return enemyRB.velocity;
     }
 
     public List<GameObject> EnemyBullets()
