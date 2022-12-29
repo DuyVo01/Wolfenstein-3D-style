@@ -59,15 +59,12 @@ public class EnemyShootingState : BaseEnemyState
         base.PhysicalUpdate();
         if(_enemyShootingTime > 0.01f)
         {
+            
             if (Time.time > _enemyLastFireTime + enemyStateManager.enemyFireRate)
             {
-                enemyStateManager.enemyAnimator.SetBool("Shooting", true);
+                enemyStateManager.enemyAnimator.SetTrigger("Shoot");
                 ShootingBullet();
                 _enemyLastFireTime = Time.time;
-            }
-            else
-            {
-                enemyStateManager.enemyAnimator.SetBool("Shooting", false);
             }
             _enemyShootingTime -= Time.deltaTime;
         }
@@ -97,8 +94,8 @@ public class EnemyShootingState : BaseEnemyState
             _enemyBulletToShoot.transform.rotation = enemyStateManager.bulletSocket.transform.rotation;
             _enemyBulletToShoot.SetActive(true);
             bulletRB.AddForce(Time.deltaTime * enemyStateManager.enemyBulletSpeed * BulletDirection() - bulletRB.velocity, ForceMode.VelocityChange);
-            
 
+            
         }
     }
 
