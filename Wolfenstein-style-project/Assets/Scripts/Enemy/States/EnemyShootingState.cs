@@ -49,7 +49,7 @@ public class EnemyShootingState : BaseEnemyState
         }
         else
         {
-            enemyStateManager.RotateToTarget();
+            enemyStateManager.RotateToTarget(); 
         }
         
     }
@@ -82,6 +82,12 @@ public class EnemyShootingState : BaseEnemyState
         }  
     }
 
+    public override void LateUpdate()
+    {
+        base.LateUpdate();
+        enemyStateManager.weaponAiming.Aiming();
+    }
+
     private void ShootingBullet()
     {
         _enemyBulletToShoot = EnemyBulletToShoot();
@@ -94,8 +100,7 @@ public class EnemyShootingState : BaseEnemyState
             _enemyBulletToShoot.transform.rotation = enemyStateManager.bulletSocket.transform.rotation;
             _enemyBulletToShoot.SetActive(true);
             bulletRB.AddForce(Time.deltaTime * enemyStateManager.enemyBulletSpeed * BulletDirection() - bulletRB.velocity, ForceMode.VelocityChange);
-
-            
+            enemyStateManager.muzzleFlash.Play();
         }
     }
 
@@ -113,8 +118,7 @@ public class EnemyShootingState : BaseEnemyState
 
     private Vector3 BulletDirection()
     {
-        //Vector3 direction = enemyStateManager.targetPosition - enemyStateManager.transform.position;
-        Vector3 direction = enemyStateManager.transform.forward;
+        Vector3 direction = enemyStateManager.targetPosition - enemyStateManager.aimPosition.position;
         direction.x += Random.Range(-enemyStateManager.enemyBulletSpread, enemyStateManager.enemyBulletSpread);
         direction.y += Random.Range(-enemyStateManager.enemyBulletSpread, enemyStateManager.enemyBulletSpread);
         direction.Normalize();

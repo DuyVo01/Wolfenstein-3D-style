@@ -30,4 +30,9 @@ public class EnemyStateMachine
     {
         currentState.PhysicalUpdate();
     }
+
+    public void LateUpdate()
+    {
+        currentState.LateUpdate();
+    }
 }

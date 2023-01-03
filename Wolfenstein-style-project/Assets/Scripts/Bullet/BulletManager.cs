@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class BulletManager : MonoBehaviour
 {
+    public static event Action OnBulletImpact;
+
     Vector3 _previousPosition;
     [SerializeField] LayerMask _layerToCollide;
     [SerializeField] ParticleSystem bulletImpact;
@@ -22,13 +25,18 @@ public class BulletManager : MonoBehaviour
     private void Update()
     {
         Ray ray = new Ray(_previousPosition, (transform.position - _previousPosition).normalized);
-
         if (Physics.Raycast(ray, out RaycastHit hit, Vector3.Distance(_previousPosition, transform.position), _layerToCollide))
         {
             gameObject.SetActive(false);
             Instantiate(bulletImpact, hit.point, bulletImpact.transform.rotation);
-        }
 
+            IDamagable IHitObject = hit.collider.GetComponent<IDamagable>();
+            if(IHitObject != null)
+            {
+                IHitObject.Damage(10);
+            }
+            OnBulletImpact?.Invoke();
+        }
         _previousPosition = transform.position;
     }
 

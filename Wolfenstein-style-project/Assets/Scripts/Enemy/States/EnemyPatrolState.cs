@@ -9,9 +9,6 @@ public class EnemyPatrolState : BaseEnemyState
     private int patrolIndex = 0;
     private Vector3 lastKnownPatrolPoint;
 
-    private float patrolLookingStartTime;
-    private float patrolLookingTime;
-
     private float recognitionStartTime;
     private float recognitionTime;
 
@@ -20,37 +17,42 @@ public class EnemyPatrolState : BaseEnemyState
         this.patrolPoints = patrolPoints;
         lastKnownPatrolPoint = patrolPoints[0].position;
         recognitionStartTime = enemyStateManager.recognitionTime;
-        patrolLookingStartTime = enemyStateManager.patrolLookingTime;
     }
 
     public override void Enter()
     {
+        base.Enter();
         enemyStateManager.agent.SetDestination(lastKnownPatrolPoint);
         recognitionTime = recognitionStartTime;
-        base.Enter();
+        Debug.Log("Enemy Patrol");
+        enemyStateManager.enemyAnimator.SetBool("Patrol", true);
     }
 
     public override void Exit()
     {
         base.Exit();
         lastKnownPatrolPoint = patrolPoints[patrolIndex].position;
+        enemyStateManager.enemyAnimator.SetBool("Patrol", false);
     }
 
     public override void LogicalUpdate()
     {
         base.LogicalUpdate();
-        if(enemyStateManager.agent.remainingDistance <= 0.01f)
+        if(enemyStateManager.agent.remainingDistance <= 0.5f)
         {
-            if (patrolLookingTime > 0)
-            {
-                patrolLookingTime -= Time.deltaTime;
-            }
-            else
-            {
-                patrolLookingTime = patrolLookingStartTime;
-                ToNextPatrolPoint();
-            }
-            
+            //if (patrolLookingTime > 0)
+            //{
+            //    patrolLookingTime -= Time.deltaTime;
+            //}
+            //else
+            //{
+            //    patrolIndex++;
+            //    patrolLookingTime = patrolLookingStartTime;
+            //    ToNextPatrolPoint();
+            //}
+            patrolIndex++;
+            ToNextPatrolPoint();
+            stateMachine.ChangeState(enemyStateManager.enemyStationaryState);
         } 
         else if (enemyStateManager.isDetectingPlayer)
         {
@@ -72,17 +74,9 @@ public class EnemyPatrolState : BaseEnemyState
 
     private void ToNextPatrolPoint()
     {
-        
         if (patrolIndex == patrolPoints.Length)
         {
             patrolIndex = 0;
         }
-        else
-        {
-            enemyStateManager.agent.SetDestination(patrolPoints[patrolIndex].position);
-            Debug.Log(patrolIndex);
-            patrolIndex++;
-        }
-        
     }
 }

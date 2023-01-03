@@ -129,6 +129,7 @@ public class Shooting : MonoBehaviour
 
         if (_bulletToShoot != null)
         {
+            
             _bulletToShoot.GetComponent<Rigidbody>().velocity = Vector3.zero;
             _bulletToShoot.transform.position = bulletSocket.transform.position;
             _bulletToShoot.transform.rotation = bulletSocket.transform.rotation;

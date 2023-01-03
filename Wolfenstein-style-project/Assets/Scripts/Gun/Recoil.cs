@@ -8,8 +8,6 @@ public class Recoil : MonoBehaviour
     public CinemachineVirtualCamera _virtualCamera;
     public CinemachinePOV _virtualPOV;
 
-    public PlayerActionInputHandler playerActionInputHandler;
-
     [Header("Recoil Properties")]
     [SerializeField] float _recoilX;
     [SerializeField] float _recoilY;
@@ -24,37 +22,17 @@ public class Recoil : MonoBehaviour
 
     private void Awake()
     {
-        _virtualCamera = GetComponent<CinemachineVirtualCamera>();
         _virtualPOV = _virtualCamera.GetCinemachineComponent<CinemachinePOV>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
     }
 
     public void RecoilShoot()
     {
         float recoilX = _recoilX * Time.deltaTime;
         float recoilY = _recoilY * Time.deltaTime;
-
         recoilX = Random.Range(-recoilX, recoilX);
         recoilY = Random.Range(0, recoilY);
-
-        //_virtualPOV.m_HorizontalAxis.Value -= recoilX * _recoilSnappiness;
-        //_virtualPOV.m_VerticalAxis.Value -= recoilY * _recoilSnappiness;
-
         _virtualPOV.m_HorizontalAxis.Value = Mathf.Lerp(_virtualPOV.m_HorizontalAxis.Value, _virtualPOV.m_HorizontalAxis.Value - recoilX, _recoilSnappiness);
         _virtualPOV.m_VerticalAxis.Value = Mathf.Lerp(_virtualPOV.m_VerticalAxis.Value, _virtualPOV.m_VerticalAxis.Value - recoilY, _recoilSnappiness);
-
-        //_totalRecoilAmountX += recoilX * _recoilSnappiness;
-        //_totalRecoilAmountY += recoilY * _recoilSnappiness;
-
         _totalRecoilAmountX = Mathf.Lerp(_totalRecoilAmountX, _totalRecoilAmountX + recoilX, _recoilSnappiness);
         _totalRecoilAmountY = Mathf.Lerp(_totalRecoilAmountY, _totalRecoilAmountY + recoilY, _recoilSnappiness);
     }
@@ -63,18 +41,11 @@ public class Recoil : MonoBehaviour
     {
         if (_totalRecoilAmountY > 0)
         {
-            //_virtualPOV.m_VerticalAxis.Value += _recoilY * Time.deltaTime * _recoilReturnSpeed;
-            //_totalRecoilAmountY -= _recoilY * Time.deltaTime * _recoilReturnSpeed;
-
             _virtualPOV.m_VerticalAxis.Value = Mathf.Lerp(_virtualPOV.m_VerticalAxis.Value, _virtualPOV.m_VerticalAxis.Value + _totalRecoilAmountY, Time.deltaTime * _recoilReturnSpeed);
             _totalRecoilAmountY = Mathf.Lerp(_totalRecoilAmountY, 0, Time.deltaTime * _recoilReturnSpeed);
         }
-
         if(_totalRecoilAmountX > 0)
         {
-            //_virtualPOV.m_HorizontalAxis.Value += _recoilX * Time.deltaTime * _recoilReturnSpeed;
-            //_totalRecoilAmountX -= _recoilX * Time.deltaTime * _recoilReturnSpeed;
-
             _virtualPOV.m_HorizontalAxis.Value = Mathf.Lerp(_virtualPOV.m_HorizontalAxis.Value, _virtualPOV.m_HorizontalAxis.Value + _totalRecoilAmountX, Time.deltaTime * _recoilReturnSpeed);
             _totalRecoilAmountX = Mathf.Lerp(_totalRecoilAmountX, 0, Time.deltaTime * _recoilReturnSpeed);
         }

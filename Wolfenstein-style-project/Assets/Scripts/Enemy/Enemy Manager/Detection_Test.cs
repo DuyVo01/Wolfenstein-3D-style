@@ -8,15 +8,21 @@ public class Detection_Test : MonoBehaviour
     [SerializeField] [Range(0, 360)] private float _inRangeAngle; 
     [SerializeField] private LayerMask _layerToDetect;
     [SerializeField] private LayerMask _RaycastCheckLayers;
-    [SerializeField] private float _detectionRangeFromBehind;
+    [SerializeField] private float _behindDetectionRange;
+    [SerializeField] private Transform aimPosition;
+    [SerializeField] private float maxVerticleDetection;
 
     bool _isTargetInRange;
     public bool isDetectingPlayer;
 
     Collider[] _inRangeColliders;
     public Vector3 targetPlayerPosition;
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
+    {
+        
+    }
+
+    private void OnDisable()
     {
         
     }
@@ -25,12 +31,11 @@ public class Detection_Test : MonoBehaviour
     void Update()
     {
         CheckIfPlayerInRange();
-        
     }
 
     private void CheckIfPlayerInRange()
     {
-        _inRangeColliders = Physics.OverlapSphere(transform.position, _inRangeRadius, _layerToDetect);
+        _inRangeColliders = Physics.OverlapSphere(aimPosition.position, _inRangeRadius, _layerToDetect);
 
         if(_inRangeColliders.Length != 0)
         {
@@ -44,9 +49,10 @@ public class Detection_Test : MonoBehaviour
                 }
             }
 
-            Vector3 direction = (targetPlayerPosition - transform.position).normalized;
-            direction.y = 0;
-            float angle = Vector3.Angle(transform.forward, direction);
+            Vector3 direction = (targetPlayerPosition - aimPosition.position).normalized;
+            direction.y = Mathf.Clamp(direction.y, -maxVerticleDetection, maxVerticleDetection);
+            
+            float angle = Vector3.Angle(aimPosition.forward, direction);
             if (_inRangeAngle/2 > angle)
             {
                 _isTargetInRange = true;
@@ -54,7 +60,7 @@ public class Detection_Test : MonoBehaviour
             }
             else
             {
-                if (Vector3.Distance(transform.position, targetPlayerPosition) <= _detectionRangeFromBehind)
+                if (Vector3.Distance(aimPosition.position, targetPlayerPosition) <= _behindDetectionRange)
                 {
                     CheckForPlayerDetection(direction);
                 }
@@ -70,11 +76,11 @@ public class Detection_Test : MonoBehaviour
 
     private void CheckForPlayerDetection(Vector3 direction)
     {
-        Ray rayToPlayer = new Ray(transform.position, direction);
+        Ray rayToPlayer = new Ray(aimPosition.position, direction);
 
-        if (Physics.Raycast(rayToPlayer, out RaycastHit hit, Vector3.Distance(transform.position, targetPlayerPosition), _RaycastCheckLayers))
+        if (Physics.Raycast(rayToPlayer, out RaycastHit hit, Vector3.Distance(aimPosition.position, targetPlayerPosition), _RaycastCheckLayers))
         {
-            Debug.DrawLine(transform.position, hit.point);
+            Debug.DrawLine(aimPosition.position, hit.point);
             if (hit.collider.CompareTag("PlayerHurtbox"))
             {
                 isDetectingPlayer = true;
@@ -84,13 +90,10 @@ public class Detection_Test : MonoBehaviour
                 isDetectingPlayer = false;
             }
         }
-        
-
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(transform.position, _inRangeRadius);
-
+        Gizmos.DrawWireSphere(aimPosition.position, _inRangeRadius);
     }
 }

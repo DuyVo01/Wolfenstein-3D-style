@@ -16,7 +16,13 @@ public class EnemySearchingState : BaseEnemyState
     {
         base.Enter();
         searchingPassedTime = searchingTime;
+        if (enemyStateManager.enemyStatus.isTakingDamage)
+        {
+            enemyStateManager.lastKnownTargetPosition = enemyStateManager.player.position;
+            enemyStateManager.enemyStatus.isTakingDamage = false;
+        }
         enemyStateManager.agent.SetDestination(enemyStateManager.lastKnownTargetPosition);
+        enemyStateManager.enemyAnimator.SetBool("Searching", true);
         enemyStateManager.agent.speed = enemyStateManager.agent.speed * 2;
     }
 
@@ -24,6 +30,7 @@ public class EnemySearchingState : BaseEnemyState
     {
         base.Exit();
         enemyStateManager.agent.speed = enemyStateManager.agent.speed / 2;
+        enemyStateManager.enemyAnimator.SetBool("Searching", false);
     }
 
     public override void LogicalUpdate()
@@ -35,6 +42,7 @@ public class EnemySearchingState : BaseEnemyState
         }
         else
         {
+            enemyStateManager.enemyAnimator.SetFloat("Distance", enemyStateManager.agent.remainingDistance);
             if (enemyStateManager.agent.remainingDistance < 0.01f)
             {
                 if (searchingPassedTime > 0)
@@ -47,7 +55,6 @@ public class EnemySearchingState : BaseEnemyState
                 }
             }
         }
-
         
     }
 
