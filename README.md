@@ -1,4 +1,13 @@
 # Wolfenstein-3D-style
+Changelogs 01/03/2023
+  - Added additional enemy AI detection, the AI will notice bullet when hit by player and go to player's position.
+  - Added Death state, enemy will die when its health reaches 0.
+  - Added humanoid model to enemy.
+  - Added Animations to all states.
+  - Enemy model can rotate to its target position regardless of direction.
+  - Added humanoid model to player. Player now has its hands attached to gun instead of just having gun before the camera.
+  - Player model can rotate according to camera rotation regardless of direction.
+
 Changelogs 29/12/2022
   - Improved enemy AI behaviour, added more states to enemy state machine for different behaviour such as: patrolling, searching, shooting, stationary.
   - Patrolling: Enemy will move in a fixed set of points, this can be customized.
