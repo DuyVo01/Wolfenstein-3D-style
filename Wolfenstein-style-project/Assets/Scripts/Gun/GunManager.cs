@@ -9,6 +9,8 @@ public class GunManager : MonoBehaviour
     [SerializeField] float angleToRotate;
     [SerializeField] float returnSpeed;
 
+    public Transform weaponHolder;
+
     private Vector3 originalRotation;
 
     private Vector3 _gunShootTargetRotation;
@@ -33,7 +35,7 @@ public class GunManager : MonoBehaviour
 
     private void Start()
     {
-        originalRotation = transform.localRotation.eulerAngles;
+        originalRotation = weaponHolder.transform.localRotation.eulerAngles;
     }
 
     private void Update()
@@ -45,7 +47,7 @@ public class GunManager : MonoBehaviour
     {
         _gunShootTargetRotation = Vector3.Lerp(_gunShootTargetRotation, originalRotation, returnSpeed * Time.deltaTime);
         _gunShootCurrentRotation = Vector3.Slerp(_gunShootCurrentRotation, _gunShootTargetRotation, returnSpeed * Time.deltaTime);
-        transform.localRotation = Quaternion.Euler(_gunShootTargetRotation);
+        weaponHolder.transform.localRotation = Quaternion.Euler(_gunShootTargetRotation);
     }
 
     public void ShootingAnimation()

@@ -40,16 +40,6 @@ public class EnemyPatrolState : BaseEnemyState
         base.LogicalUpdate();
         if(enemyStateManager.agent.remainingDistance <= 0.5f)
         {
-            //if (patrolLookingTime > 0)
-            //{
-            //    patrolLookingTime -= Time.deltaTime;
-            //}
-            //else
-            //{
-            //    patrolIndex++;
-            //    patrolLookingTime = patrolLookingStartTime;
-            //    ToNextPatrolPoint();
-            //}
             patrolIndex++;
             ToNextPatrolPoint();
             stateMachine.ChangeState(enemyStateManager.enemyStationaryState);

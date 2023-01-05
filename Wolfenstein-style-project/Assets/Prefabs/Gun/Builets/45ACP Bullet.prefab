@@ -67,7 +67,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _layerToCollide:
     serializedVersion: 2
-    m_Bits: 384
+    m_Bits: 8576
   bulletImpact: {fileID: 1596561165271968373, guid: e94915ff5280cf44792dbe97596e372b, type: 3}
 --- !u!65 &1628429493331110532
 BoxCollider:

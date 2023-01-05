@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class PlayerStateManager : MonoBehaviour
 {
@@ -10,7 +11,10 @@ public class PlayerStateManager : MonoBehaviour
     public PlayerMovementInputHandler playerMovementInputHandler;
     public PlayerActionInputHandler playerActionInputHandler;
     public Transform aimingTarget;
+    public Transform aimingRigTarget;
     public CapsuleCollider playerCapsuleCollider;
+    public CinemachineVirtualCamera cinemachineVC;
+    public CinemachineBasicMultiChannelPerlin cinemachineNoise;
 
     [Header("Body Components")]
     public Transform body;
@@ -42,6 +46,7 @@ public class PlayerStateManager : MonoBehaviour
     private StateMachine _stateMachine;
     private Vector3 _movementDirection;
     
+    
     //Ground child States
     public IdleState idleState;
     public WalkState walkState;
@@ -57,6 +62,7 @@ public class PlayerStateManager : MonoBehaviour
         playerActionInputHandler = GetComponent<PlayerActionInputHandler>();
         playerCapsuleCollider = GetComponent<CapsuleCollider>();
         cameraMain = Camera.main;
+        cinemachineNoise = cinemachineVC.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
     }
 
     private void Start()
@@ -67,29 +73,27 @@ public class PlayerStateManager : MonoBehaviour
         runState = new RunState(_stateMachine, this);
         inAirState = new InAirState(_stateMachine, this);
         _stateMachine.Initialize(idleState);
-        
     }
     
     private void Update()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = true;
-        MovementDirectionRelatedToCameraDirection();
-        _stateMachine.LogicalUpdate();
         
-    }
+        _stateMachine.LogicalUpdate();
 
+    }
     
     private void FixedUpdate()
     {
         GroundCheck();
-        BodyRotation();
+        MovementDirectionRelatedToCameraDirection();
         _stateMachine.PhysicalUpdate();
     }
 
     private void LateUpdate()
     {
-        
+        BodyRotation();
     }
 
     private void MovementDirectionRelatedToCameraDirection()
@@ -102,7 +106,15 @@ public class PlayerStateManager : MonoBehaviour
     public void BodyRotation()
     {
         Quaternion targetRotation = Quaternion.Euler(0, cameraMain.transform.eulerAngles.y, 0);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        //playerRB.MoveRotation(Quaternion.Slerp(playerRB.rotation, targetRotation, rotationSpeed * Time.deltaTime));
+        
+
+        Vector3 direction = aimingRigTarget.position - transform.position;
+        direction.y = 0;
+        direction.Normalize();
+        //Quaternion targetRotation = Quaternion.LookRotation(direction);
+        //playerRB.rotation = Quaternion.Slerp(playerRB.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        body.localRotation = Quaternion.Slerp(body.localRotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
     public void GroundCheck()

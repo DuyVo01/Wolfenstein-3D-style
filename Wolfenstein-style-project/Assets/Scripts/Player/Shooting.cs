@@ -75,13 +75,11 @@ public class Shooting : MonoBehaviour
 
     private void FixedUpdate()
     {
-
         if (_isShooting && Time.time > _lastFire + fireRate)
         {
             ShootingBullet?.Invoke();
             HitPoint();
             ShootingBullets();
-
             _lastFire = Time.time;
         }
         else
@@ -91,7 +89,6 @@ public class Shooting : MonoBehaviour
 
         if (Time.time > _lastFire + recoilCooldown)
         {
-
             _recoil.ResetRecoil();
         }
     }
@@ -99,19 +96,14 @@ public class Shooting : MonoBehaviour
     public void HitPoint()
     {
         Vector2 mousePosition = _playerStateManager.playerMovementInputHandler.GetMousePosition();
-
         Vector2 rayToCast = mousePosition;
-
         rayToCast.x += UnityEngine.Random.Range(-swayRadius, swayRadius);
         rayToCast.y += UnityEngine.Random.Range(-swayRadius, swayRadius);
-
         if (Vector3.Distance(rayToCast, mousePosition) > swayRadius)
         {
             rayToCast = mousePosition;
         }
-
         _ray = _playerStateManager.cameraMain.ScreenPointToRay(rayToCast);
-
         if (Physics.Raycast(_ray, out _rayHit, float.MaxValue, _playerStateManager.layerMask))
         {
             _playerStateManager.aimingTarget.position = _rayHit.point;
@@ -122,24 +114,17 @@ public class Shooting : MonoBehaviour
     {
         
         RecoilOnCameraShake();
-
         _recoil.RecoilShoot();
-
         _bulletToShoot = BulletToShoot();
-
         if (_bulletToShoot != null)
         {
-            
             _bulletToShoot.GetComponent<Rigidbody>().velocity = Vector3.zero;
             _bulletToShoot.transform.position = bulletSocket.transform.position;
             _bulletToShoot.transform.rotation = bulletSocket.transform.rotation;
             _bulletToShoot.SetActive(true);
             _bulletToShoot.GetComponent<Rigidbody>().AddForce(Time.deltaTime * bulletSpeed * (_playerStateManager.aimingTarget.position - _bulletToShoot.transform.position).normalized - _bulletToShoot.GetComponent<Rigidbody>().velocity, ForceMode.VelocityChange);
-
             muzzleFlashPaticle.Play();
         }
-        
-
     }
 
     private GameObject BulletToShoot() 

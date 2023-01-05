@@ -7,6 +7,17 @@ public class PlayerActionInputHandler : MonoBehaviour
 {
     private bool _isShoot;
 
+    public bool isInteract;
+    private float _interactingStart;
+    public float _interactingTime;
+
+    private void Update()
+    {
+        if (isInteract && Time.time > _interactingStart + _interactingTime)
+        {
+            isInteract = false;
+        }
+    }
     public void Shoot(InputAction.CallbackContext context)
     {
         if (context.started)
@@ -16,6 +27,19 @@ public class PlayerActionInputHandler : MonoBehaviour
         if (context.canceled)
         {
             _isShoot = false;
+        }
+    }
+
+    public void Interact(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            _interactingStart = Time.time;
+            isInteract = true;
+        }
+        if (context.canceled )
+        {
+            isInteract = false;
         }
     }
 
