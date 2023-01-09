@@ -27,6 +27,7 @@ public class BaseEnemyState
         if(enemyStateManager.enemyStatus.enemyCurrentHealth <= 0)
         {
             stateMachine.ChangeState(enemyStateManager.enemyDeathState);
+            enemyStateManager.enemyStatus.enemyCurrentHealth = 1;
         }
     }
 

@@ -65,9 +65,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4669bf526d96814788a953fc399f595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 1
   _layerToCollide:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 8832
   bulletImpact: {fileID: 19800002, guid: 23f99930034a9524197e7f5979042663, type: 3}
 --- !u!65 &1628429493331110532
 BoxCollider:

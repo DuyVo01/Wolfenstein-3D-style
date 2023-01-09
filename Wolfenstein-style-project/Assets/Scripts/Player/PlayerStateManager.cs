@@ -15,6 +15,7 @@ public class PlayerStateManager : MonoBehaviour
     public CapsuleCollider playerCapsuleCollider;
     public CinemachineVirtualCamera cinemachineVC;
     public CinemachineBasicMultiChannelPerlin cinemachineNoise;
+    public Animator playerAnimator;
 
     [Header("Body Components")]
     public Transform body;
@@ -46,7 +47,6 @@ public class PlayerStateManager : MonoBehaviour
     private StateMachine _stateMachine;
     private Vector3 _movementDirection;
     
-    
     //Ground child States
     public IdleState idleState;
     public WalkState walkState;
@@ -54,6 +54,8 @@ public class PlayerStateManager : MonoBehaviour
     
     //Air State
     public InAirState inAirState;
+
+    Vector3 mouseTurn;
 
     private void Awake()
     {
@@ -79,21 +81,22 @@ public class PlayerStateManager : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = true;
-        
+        BodyRotation();
         _stateMachine.LogicalUpdate();
-
     }
     
     private void FixedUpdate()
     {
+        //BodyRotation();
         GroundCheck();
         MovementDirectionRelatedToCameraDirection();
         _stateMachine.PhysicalUpdate();
+        
     }
 
     private void LateUpdate()
     {
-        BodyRotation();
+        cinemachineVC.transform.localRotation = Quaternion.Euler(body.eulerAngles);
     }
 
     private void MovementDirectionRelatedToCameraDirection()
@@ -102,19 +105,18 @@ public class PlayerStateManager : MonoBehaviour
         _movementDirection = _movementDirection.x * cameraMain.transform.right.normalized + _movementDirection.z * cameraMain.transform.forward.normalized;
         _movementDirection.y = 0;
     }
-
     public void BodyRotation()
     {
-        Quaternion targetRotation = Quaternion.Euler(0, cameraMain.transform.eulerAngles.y, 0);
-        //playerRB.MoveRotation(Quaternion.Slerp(playerRB.rotation, targetRotation, rotationSpeed * Time.deltaTime));
-        
+        //mouseTurn.x += playerMovementInputHandler.GetMouseDelta().x * Time.deltaTime * 10;
+        //mouseTurn.y += playerMovementInputHandler.GetMouseDelta().y * Time.deltaTime * 10;
+        //transform.rotation = Quaternion.Euler(0, mouseTurn.x, 0);
+        //body.rotation = Quaternion.Euler(-mouseTurn.y, mouseTurn.x, 0);
 
-        Vector3 direction = aimingRigTarget.position - transform.position;
-        direction.y = 0;
-        direction.Normalize();
-        //Quaternion targetRotation = Quaternion.LookRotation(direction);
-        //playerRB.rotation = Quaternion.Slerp(playerRB.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        body.localRotation = Quaternion.Slerp(body.localRotation, targetRotation, rotationSpeed * Time.deltaTime);
+        Quaternion targetFeetRotation = Quaternion.Euler(0, cameraMain.transform.rotation.eulerAngles.y, 0);
+        body.rotation = Quaternion.Slerp(body.rotation, targetFeetRotation, rotationSpeed * Time.deltaTime);
+        //playerRB.MoveRotation(targetFeetRotation);
+        //Vector3 targetRot = Vector3.Cross(cinemachineVC.transform.forward, transform.forward);
+        //playerRB.AddTorque(targetRot * rotationSpeed - playerRB.angularVelocity);
     }
 
     public void GroundCheck()
@@ -131,13 +133,9 @@ public class PlayerStateManager : MonoBehaviour
         if (rayDidHit)
         {
             Debug.DrawRay(playerCapsuleCollider.bounds.center, downRay.direction * rideHeight, Color.yellow);
-
             float distanceToLift = playerCapsuleCollider.center.y * transform.localScale.y - rayFloatHit.distance;
-
             float amountToLift = distanceToLift * 10 - playerRB.velocity.y;
-
             Vector3 springForce = new Vector3(0f, amountToLift, 0f);
-
             playerRB.AddForce(springForce, ForceMode.VelocityChange);
         }   
     }

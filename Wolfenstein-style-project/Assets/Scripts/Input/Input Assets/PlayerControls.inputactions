@@ -33,6 +33,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Reload",
+                    "type": "Button",
+                    "id": "48d1d599-8d34-4c4c-a521-606c69a7aadb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Shoot",
                     "type": "Button",
                     "id": "75068ed0-9365-49aa-9d6b-7633a38972c3",
@@ -148,6 +157,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Interacting",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3cc08171-847b-45ab-9582-026dfcfa1d2b",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Reload",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

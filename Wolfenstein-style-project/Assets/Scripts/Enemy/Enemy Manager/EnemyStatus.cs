@@ -8,6 +8,7 @@ public class EnemyStatus : MonoBehaviour, IDamagable
     public float enemyCurrentHealth;
 
     public bool isTakingDamage;
+    public bool isDeath;
 
     private void Start()
     {
@@ -16,8 +17,12 @@ public class EnemyStatus : MonoBehaviour, IDamagable
 
     public void Damage(float damageAmount)
     {
-        enemyCurrentHealth -= damageAmount;
-        isTakingDamage = true;
+        if (!isDeath)
+        {
+            enemyCurrentHealth -= damageAmount;
+            isTakingDamage = true;
+        }
+        
     }
 
     

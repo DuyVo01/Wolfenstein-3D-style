@@ -6,22 +6,15 @@ using Cinemachine;
 
 public class Shooting : MonoBehaviour
 {
-    [Header("Cinemachine Impulse")]
-    [SerializeField] CinemachineImpulseSource cameraImpulseSource;
+    private GameObject bulletPrefab;
+    private GameObject bulletBarrel;
+    private GameObject bulletPool;
+    private ParticleSystem muzzleFlashPaticle;
 
-    [Header("Bullet")]
-    [SerializeField] GameObject bulletPrefab;
-    [SerializeField] GameObject bulletSocket;
-    [SerializeField] GameObject bulletPool;
-
-    [Header("Particle Muzzle Flash")]
-    [SerializeField] ParticleSystem muzzleFlashPaticle;
-
-    [Header("Gun properties")]
-    [SerializeField] int maxBulletHodingCapacity;
-    [SerializeField] int totalNumberOfBullet;
-    [SerializeField] int gunMaxCapacity;
-    [SerializeField] int currentNumberOfBullet;
+    private int ammoHoldingCapacity;
+    private int currentAmmoHolding;
+    private int ammoCapacity;
+    private int currentAmmo;
 
     [Header("Fire rate")]
     [SerializeField] float bulletSpeed;
@@ -35,7 +28,8 @@ public class Shooting : MonoBehaviour
     [Header("Recoil")]
     public Recoil _recoil;
 
-    
+    [Header("Current Gun Equiped")]
+    GunManager currentGun;
 
     //Raycast
     private RaycastHit _rayHit;
@@ -43,10 +37,12 @@ public class Shooting : MonoBehaviour
 
     //Shoot variables
     private bool _isShooting;
+    private bool _canShoot;
     private GameObject _bulletToShoot;
 
     public static event Action ShootingBullet;
     public static event Action ShootingBulletDone;
+    public static event Action ShootingEmpty;
 
     private PlayerStateManager _playerStateManager;
     private List<GameObject> bullets = new List<GameObject>();
@@ -54,42 +50,64 @@ public class Shooting : MonoBehaviour
     private void Awake()
     {
         _playerStateManager = GetComponent<PlayerStateManager>();
-        cameraImpulseSource = GetComponent<CinemachineImpulseSource>();
-    }
-
-    private void Start()
-    {
-        for (int i = 0; i < gunMaxCapacity; i++)
-        {
-            GameObject bullet = Instantiate(bulletPrefab, bulletSocket.transform.position, bulletPrefab.transform.rotation, bulletPool.transform);
-            bullet.SetActive(false);
-            bullets.Add(bullet);
-        }
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        _isShooting = _playerStateManager.playerActionInputHandler.GetShootInput();
+        if (PlayerStatus.isWeaponEquipped)
+        {
+            if(currentGun != PlayerStatus.currentWeaponEquipped)
+            {
+                currentGun = PlayerStatus.currentWeaponEquipped.GetComponent<GunManager>();
+            }
+            _isShooting = _playerStateManager.playerActionInputHandler.GetShootInput();
+            GetGunData();
+            if(currentAmmo > 0)
+            {
+                
+                _canShoot = true;
+            }
+            else
+            {
+                _canShoot = false;
+                
+            }
+        }
+        else
+        {
+            _canShoot = false;
+        }
     }
 
     private void FixedUpdate()
     {
-        if (_isShooting && Time.time > _lastFire + fireRate)
+        if (_canShoot)
         {
-            ShootingBullet?.Invoke();
-            HitPoint();
-            ShootingBullets();
-            _lastFire = Time.time;
+            if (_isShooting && Time.time > _lastFire + fireRate)
+            {
+                ShootingBullet?.Invoke();
+                HitPoint();
+                ShootingBullets();
+                _lastFire = Time.time;
+            }
+            else
+            {
+                ShootingBulletDone?.Invoke();
+            }
+            if (Time.time > _lastFire + recoilCooldown)
+            {
+                _recoil.ResetRecoil();
+            }
         }
         else
         {
-            ShootingBulletDone?.Invoke();
-        }
-
-        if (Time.time > _lastFire + recoilCooldown)
-        {
-            _recoil.ResetRecoil();
+            if (_isShooting && Time.time > _lastFire + fireRate)
+            {
+                ShootingEmpty?.Invoke();
+                _lastFire = Time.time;
+            }
         }
     }
 
@@ -112,15 +130,13 @@ public class Shooting : MonoBehaviour
 
     private void ShootingBullets()
     {
-        
-        RecoilOnCameraShake();
         _recoil.RecoilShoot();
         _bulletToShoot = BulletToShoot();
         if (_bulletToShoot != null)
         {
             _bulletToShoot.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            _bulletToShoot.transform.position = bulletSocket.transform.position;
-            _bulletToShoot.transform.rotation = bulletSocket.transform.rotation;
+            _bulletToShoot.transform.position = bulletBarrel.transform.position;
+            _bulletToShoot.transform.rotation = bulletBarrel.transform.rotation;
             _bulletToShoot.SetActive(true);
             _bulletToShoot.GetComponent<Rigidbody>().AddForce(Time.deltaTime * bulletSpeed * (_playerStateManager.aimingTarget.position - _bulletToShoot.transform.position).normalized - _bulletToShoot.GetComponent<Rigidbody>().velocity, ForceMode.VelocityChange);
             muzzleFlashPaticle.Play();
@@ -139,8 +155,17 @@ public class Shooting : MonoBehaviour
         return null;
     }
 
-    private void RecoilOnCameraShake()
+    private void GetGunData()
     {
-        cameraImpulseSource.GenerateImpulse(_playerStateManager.cameraMain.transform.forward);
+        ammoHoldingCapacity = currentGun.ammoHoldingCapacity;
+        ammoCapacity = currentGun.ammoCapacity;
+        currentAmmoHolding = currentGun.currentAmmoHolding;
+        currentAmmo = currentGun.currentAmmo;
+        bulletPool = currentGun.bulletPool;
+        bulletPrefab = currentGun.bulletPrefab;
+        bulletBarrel = currentGun.bulletBarrel;
+        bullets = currentGun.bullets;
+        fireRate = currentGun.fireRate;
+        muzzleFlashPaticle = currentGun.muzzleFlash;
     }
 }

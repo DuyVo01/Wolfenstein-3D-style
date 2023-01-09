@@ -41,17 +41,11 @@ public class WalkState : GroundState
     public void WalkMove(Vector3 movementDirection)
     {
         Vector3 playerHorizontalVelocity = playerStateManager.playerRB.velocity;
-
         playerHorizontalVelocity.y = 0f;
-
         Vector3 finalSpeed = playerStateManager.walkMoveSpeed * movementDirection;
-
         Vector3 speedDif = finalSpeed - playerHorizontalVelocity;
-
         float accelRate = 5;
-
         Vector3 movement = accelRate * speedDif;
-
         playerStateManager.playerRB.AddForce(movement, ForceMode.Acceleration);
     }
 

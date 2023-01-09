@@ -12,6 +12,8 @@ public class EnemyDeathState : BaseEnemyState
     {
         base.Enter();
         enemyStateManager.enemyAnimator.SetBool("Death", true);
+        PlayerStatus.AddScore(20);
+        enemyStateManager.enemyStatus.isDeath = true;
         enemyStateManager.agent.Stop();
     }
 

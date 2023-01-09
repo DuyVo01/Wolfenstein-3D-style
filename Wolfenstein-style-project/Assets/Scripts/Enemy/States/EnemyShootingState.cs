@@ -24,8 +24,8 @@ public class EnemyShootingState : BaseEnemyState
         Debug.Log("Enemy Shoot Enter");
         _enemyLastFireTime = 0;
         _enemyShootingTime = enemyStateManager.shootingStartTime;
-
-        if(_enemyBullets.Count == 0)
+        enemyStateManager.weaponAiming.Aiming();
+        if (_enemyBullets.Count == 0)
         {
             _enemyBullets = enemyStateManager.EnemyBullets();
         }
@@ -34,6 +34,7 @@ public class EnemyShootingState : BaseEnemyState
     public override void Exit()
     {
         base.Exit();
+        enemyStateManager.weaponAiming.ResetAiming();
         enemyStateManager.lastKnownTargetPosition = enemyStateManager.targetPosition;
         enemyStateManager.agent.enabled = true;
         enemyStateManager.enemyRB.isKinematic = true;
@@ -63,6 +64,7 @@ public class EnemyShootingState : BaseEnemyState
             if (Time.time > _enemyLastFireTime + enemyStateManager.enemyFireRate)
             {
                 enemyStateManager.enemyAnimator.SetTrigger("Shoot");
+                enemyStateManager.PlayAudio(enemyStateManager.audioClips[0]);
                 ShootingBullet();
                 _enemyLastFireTime = Time.time;
             }
@@ -85,7 +87,6 @@ public class EnemyShootingState : BaseEnemyState
     public override void LateUpdate()
     {
         base.LateUpdate();
-        enemyStateManager.weaponAiming.Aiming();
     }
 
     private void ShootingBullet()

@@ -13,6 +13,9 @@ public class EnemyStateManager : MonoBehaviour
     public EnemyStatus enemyStatus;
     [Header("Player Ref")]
     public Transform player;
+    [Header("Audio")]
+    public AudioSource enemyAudio;
+    public AudioClip[] audioClips;
 
     [Space(10)] 
     [Header("Enemy Shooting State")]
@@ -66,6 +69,7 @@ public class EnemyStateManager : MonoBehaviour
     private void Awake()
     {
         enemyAnimator = GetComponent<Animator>();
+        enemyAudio = GetComponent<AudioSource>();
         enemyRB = GetComponent<Rigidbody>();
         _detection = GetComponent<Detection_Test>();
         agent = GetComponent<NavMeshAgent>();
@@ -109,9 +113,9 @@ public class EnemyStateManager : MonoBehaviour
     public void RotateToTarget()
     {
         Vector3 targetDirection = _detection.targetPlayerPosition - aimPosition.position;
-        targetDirection.y = 0;
+        //targetDirection.y = 0;
         Quaternion lookToTarget = Quaternion.LookRotation(targetDirection);
-        enemyRB.MoveRotation(Quaternion.Lerp(enemyRB.rotation, lookToTarget, Time.deltaTime * rotatonSpeed));
+        enemyRB.MoveRotation(Quaternion.Lerp(enemyRB.rotation, Quaternion.Euler(enemyRB.rotation.eulerAngles.x, lookToTarget.eulerAngles.y, enemyRB.rotation.eulerAngles.z), Time.deltaTime * rotatonSpeed));
     }
 
     public Vector3 EnemyVelocity()
@@ -131,5 +135,9 @@ public class EnemyStateManager : MonoBehaviour
         return enemyBullets;
     }
 
-    
+    public void PlayAudio(AudioClip clip)
+    {
+        enemyAudio.clip = clip;
+        enemyAudio.Play();
+    }
 }

@@ -6,8 +6,9 @@ using UnityEngine.InputSystem;
 public class PlayerActionInputHandler : MonoBehaviour
 {
     private bool _isShoot;
-
     public bool isInteract;
+    public bool isReloading;
+
     private float _interactingStart;
     public float _interactingTime;
 
@@ -27,6 +28,18 @@ public class PlayerActionInputHandler : MonoBehaviour
         if (context.canceled)
         {
             _isShoot = false;
+        }
+    }
+
+    public void Reload(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            isReloading = true;
+        }
+        if (context.canceled)
+        {
+            isReloading = false;
         }
     }
 

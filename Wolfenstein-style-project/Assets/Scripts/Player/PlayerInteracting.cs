@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class PlayerInteracting : MonoBehaviour
 {
-    Camera mainCamera;
-    public LayerMask interactiveLayer;
+    public PlayerInventory inventory;
+    public LayerMask pickapleLayer;
     public float interactiveDistance;
+    public string[] pickableTag;
 
-    PlayerStateManager playerStateManager;
+    private Camera mainCamera;
+    private PlayerStateManager playerStateManager;
     private Ray interactingRay;
+
+    
 
     // Start is called before the first frame update
     private void Awake()
@@ -27,16 +31,33 @@ public class PlayerInteracting : MonoBehaviour
     {
         interactingRay = mainCamera.ScreenPointToRay(playerStateManager.playerMovementInputHandler.GetMousePosition());
         RaycastHit hit;
-        if(Physics.Raycast(interactingRay, out hit, interactiveDistance, interactiveLayer))
+        if(Physics.Raycast(interactingRay, out hit, interactiveDistance))
         {
-            Debug.Log(true);
+            Debug.DrawLine(mainCamera.transform.position, hit.point) ;
             IInteractable raycastedObject = hit.collider.GetComponent<IInteractable>();
             if(raycastedObject != null && playerStateManager.playerActionInputHandler.isInteract)
             {
                 
                 playerStateManager.playerActionInputHandler.isInteract = false;
                 raycastedObject.OnInteract();
+
+                if (isPickaple(hit.collider.tag))
+                {
+                    inventory.AddItem(hit.collider.gameObject);
+                }
             }
         }
+    }
+
+    private bool isPickaple(string itemTag)
+    {
+        for (int i = 0; i < pickableTag.Length; i++)
+        {
+            if (pickableTag[i].Equals(itemTag))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

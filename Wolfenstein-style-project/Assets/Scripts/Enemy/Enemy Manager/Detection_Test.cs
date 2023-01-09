@@ -27,6 +27,11 @@ public class Detection_Test : MonoBehaviour
         
     }
 
+    private void Start()
+    {
+        
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -42,7 +47,7 @@ public class Detection_Test : MonoBehaviour
 
             for(int i = 0; i < _inRangeColliders.Length; i++)
             {
-                if (_inRangeColliders[i].CompareTag("PlayerHurtbox"))
+                if (_inRangeColliders[i].CompareTag("PlayerHurtBox"))
                 {
                     targetPlayerPosition = _inRangeColliders[i].transform.position;
                     break;
@@ -81,7 +86,7 @@ public class Detection_Test : MonoBehaviour
         if (Physics.Raycast(rayToPlayer, out RaycastHit hit, Vector3.Distance(aimPosition.position, targetPlayerPosition), _RaycastCheckLayers))
         {
             Debug.DrawLine(aimPosition.position, hit.point);
-            if (hit.collider.CompareTag("PlayerHurtbox"))
+            if (hit.collider.CompareTag("PlayerHurtBox"))
             {
                 isDetectingPlayer = true;
             }

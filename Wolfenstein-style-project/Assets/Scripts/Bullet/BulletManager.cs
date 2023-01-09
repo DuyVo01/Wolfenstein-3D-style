@@ -7,6 +7,8 @@ public class BulletManager : MonoBehaviour
 {
     public static event Action OnBulletImpact;
 
+    public int damage;
+
     Vector3 _previousPosition;
     [SerializeField] LayerMask _layerToCollide;
     [SerializeField] ParticleSystem bulletImpact;
@@ -33,7 +35,7 @@ public class BulletManager : MonoBehaviour
             IDamagable IHitObject = hit.collider.GetComponent<IDamagable>();
             if(IHitObject != null)
             {
-                IHitObject.Damage(10);
+                IHitObject.Damage(damage);
             }
             OnBulletImpact?.Invoke();
         }
