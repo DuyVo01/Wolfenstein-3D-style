@@ -79,15 +79,27 @@ public class PlayerStateManager : MonoBehaviour
     
     private void Update()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = true;
+        if (!LevelRecord.Instance.IsGameStop)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            cinemachineVC.gameObject.SetActive(true);
+            Cursor.visible = false;
+        }
+        else
+        {
+            cinemachineVC.gameObject.SetActive(false);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        
+        
+
         BodyRotation();
         _stateMachine.LogicalUpdate();
     }
     
     private void FixedUpdate()
     {
-        //BodyRotation();
         GroundCheck();
         MovementDirectionRelatedToCameraDirection();
         _stateMachine.PhysicalUpdate();
@@ -134,7 +146,7 @@ public class PlayerStateManager : MonoBehaviour
         {
             Debug.DrawRay(playerCapsuleCollider.bounds.center, downRay.direction * rideHeight, Color.yellow);
             float distanceToLift = playerCapsuleCollider.center.y * transform.localScale.y - rayFloatHit.distance;
-            float amountToLift = distanceToLift * 10 - playerRB.velocity.y;
+            float amountToLift = distanceToLift * 25 - playerRB.velocity.y;
             Vector3 springForce = new Vector3(0f, amountToLift, 0f);
             playerRB.AddForce(springForce, ForceMode.VelocityChange);
         }   

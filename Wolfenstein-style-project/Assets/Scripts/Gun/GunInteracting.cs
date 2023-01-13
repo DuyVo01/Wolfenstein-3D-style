@@ -24,7 +24,6 @@ public class GunInteracting : MonoBehaviour, IInteractable
         if (!isEquip)
         {
             OnPickUp();
-            handIKRig.weight = 1;
         } 
     }
 
@@ -39,14 +38,20 @@ public class GunInteracting : MonoBehaviour, IInteractable
 
     public void OnPickUp()
     {
-        isEquip = true;
+        Setup();
         GunAudioManager.PlayAudio(pickupSound);
+        DisplayNotice.AddText("HandGun");
+    }
+
+    public void Setup()
+    {
         transform.SetParent(weaponPos);
         constraint.data.constrainedObject = transform;
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
         transform.localScale = new Vector3(1, 1, 1);
+        handIKRig.weight = 1;
+        isEquip = true;
         rigBuilder.Build();
-        DisplayNotice.AddText("HandGun");
     }
 }

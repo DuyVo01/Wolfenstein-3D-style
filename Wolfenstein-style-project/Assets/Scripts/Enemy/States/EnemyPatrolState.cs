@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyPatrolState : BaseEnemyState
+public class EnemyPatrolState : EnemyNonCombatState
 {
     private Transform[] patrolPoints;
 
@@ -10,21 +10,18 @@ public class EnemyPatrolState : BaseEnemyState
     private Vector3 lastKnownPatrolPoint;
 
     private float recognitionStartTime;
-    private float recognitionTime;
 
     public EnemyPatrolState(EnemyStateMachine stateMachine, EnemyStateManager enemyStateManager, Transform[] patrolPoints) : base(stateMachine, enemyStateManager)
     {
         this.patrolPoints = patrolPoints;
         lastKnownPatrolPoint = patrolPoints[0].position;
-        recognitionStartTime = enemyStateManager.recognitionTime;
     }
 
     public override void Enter()
     {
         base.Enter();
         enemyStateManager.agent.SetDestination(lastKnownPatrolPoint);
-        recognitionTime = recognitionStartTime;
-        Debug.Log("Enemy Patrol");
+        
         enemyStateManager.enemyAnimator.SetBool("Patrol", true);
     }
 
@@ -38,23 +35,16 @@ public class EnemyPatrolState : BaseEnemyState
     public override void LogicalUpdate()
     {
         base.LogicalUpdate();
-        if(enemyStateManager.agent.remainingDistance <= 0.5f)
+        if (!inCombat)
         {
-            patrolIndex++;
-            ToNextPatrolPoint();
-            stateMachine.ChangeState(enemyStateManager.enemyStationaryState);
-        } 
-        else if (enemyStateManager.isDetectingPlayer)
-        {
-            if (recognitionTime > 0)
+            if (enemyStateManager.agent.remainingDistance <= 0.5f)
             {
-               recognitionTime -= Time.deltaTime;
-            }
-            else
-            {
-               stateMachine.ChangeState(enemyStateManager.enemyShootingState);
+                patrolIndex++;
+                ToNextPatrolPoint();
+                stateMachine.ChangeState(enemyStateManager.enemyStationaryState);
             }
         }
+        
     }
 
     public override void PhysicalUpdate()

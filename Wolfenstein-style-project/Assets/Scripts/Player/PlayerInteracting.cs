@@ -37,10 +37,8 @@ public class PlayerInteracting : MonoBehaviour
             IInteractable raycastedObject = hit.collider.GetComponent<IInteractable>();
             if(raycastedObject != null && playerStateManager.playerActionInputHandler.isInteract)
             {
-                
                 playerStateManager.playerActionInputHandler.isInteract = false;
                 raycastedObject.OnInteract();
-
                 if (isPickaple(hit.collider.tag))
                 {
                     inventory.AddItem(hit.collider.gameObject);

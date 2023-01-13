@@ -10,12 +10,13 @@ public class GameOver : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlayerStatus.currentLives--;
+        PlayerPrefs.SetInt("CurrentLives", PlayerStatus.currentLives);
+        Cursor.lockState = CursorLockMode.None;
+
         if(PlayerStatus.currentLives >= 0)
         {
-
             gameOver.SetActive(false);
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(PlayerPrefs.GetString("CurrentScene"));
         }
         else
         {
@@ -23,9 +24,14 @@ public class GameOver : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnReturn()
     {
-        
+        SceneManager.LoadScene("MenuScene");
+    }
+
+    public void OnRetry()
+    {
+        PlayerPrefs.SetInt("CurrentLives", 1);
+        SceneManager.LoadScene("Level01");
     }
 }

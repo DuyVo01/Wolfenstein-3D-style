@@ -4,23 +4,50 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    public List<GameObject> inventoryItems;
-    public int carryWeight;
-
-    private void Start()
+    [field: SerializeField] public List<GameObject> InventoryItems { get; private set; }
+    [SerializeField] private int carryWeight;
+    
+    private void Awake()
     {
-        inventoryItems = new List<GameObject>();
+        InventoryItems = new List<GameObject>();
     }
 
     public void AddItem(GameObject newItems)
     {
-        
-        if (inventoryItems.Count < carryWeight)
+        if (InventoryItems.Count < carryWeight)
         {
-            inventoryItems.Add(newItems);
+            if (GetItemCount(newItems.tag) < 2)
+            {
+                InventoryItems.Add(newItems);
+            }
             if (newItems.CompareTag("Gun"))
             {
                 PlayerStatus.currentWeaponEquipped = newItems;
+            }
+        }
+    }
+
+    public int GetItemCount(string tag)
+    {
+        int count = 0;
+        foreach(GameObject item in InventoryItems)
+        {
+            if (item.CompareTag(tag))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void RemoveItem(string tag)
+    {
+        foreach (GameObject item in InventoryItems)
+        {
+            if (item.CompareTag(tag))
+            {
+                InventoryItems.Remove(item);
+                break;
             }
         }
     }

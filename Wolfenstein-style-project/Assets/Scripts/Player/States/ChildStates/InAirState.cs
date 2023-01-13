@@ -12,7 +12,7 @@ public class InAirState : BaseState
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("Enter Air State");
+        
     }
 
     public override void Exit()

@@ -13,6 +13,7 @@ public class GoldCollecting : MonoBehaviour, IInteractable
         gameObject.SetActive(false);
         EnvironmentObjects.PlayObjectAudio(collectGoid);
         DisplayNotice.AddText("Gold +10");
+        LevelRecord.Instance.UpdateTreasureCollected();
     }
 
     private void OnTriggerEnter(Collider other)

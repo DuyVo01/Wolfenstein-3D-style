@@ -15,7 +15,7 @@ public class HealthCollecting : MonoBehaviour, IInteractable
             PlayerStatus.Recover(healthAmount);
             gameObject.SetActive(false);
             EnvironmentObjects.PlayObjectAudio(eatFood);
-            DisplayNotice.AddText("Health +30");
+            DisplayNotice.AddText("Health + " + healthAmount);
         }
         
     }
@@ -29,7 +29,7 @@ public class HealthCollecting : MonoBehaviour, IInteractable
                 PlayerStatus.Recover(healthAmount);
                 gameObject.SetActive(false);
                 EnvironmentObjects.PlayObjectAudio(eatFood);
-                DisplayNotice.AddText("Health +30");
+                DisplayNotice.AddText("Health + " + healthAmount);
             } 
         }
     }

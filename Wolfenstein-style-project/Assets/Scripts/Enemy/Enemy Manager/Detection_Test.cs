@@ -12,7 +12,7 @@ public class Detection_Test : MonoBehaviour
     [SerializeField] private Transform aimPosition;
     [SerializeField] private float maxVerticleDetection;
 
-    bool _isTargetInRange;
+    public bool _isTargetInRange;
     public bool isDetectingPlayer;
 
     Collider[] _inRangeColliders;
@@ -38,11 +38,15 @@ public class Detection_Test : MonoBehaviour
         CheckIfPlayerInRange();
     }
 
+    private void FixedUpdate()
+    {
+        
+    }
+
     private void CheckIfPlayerInRange()
     {
         _inRangeColliders = Physics.OverlapSphere(aimPosition.position, _inRangeRadius, _layerToDetect);
-
-        if(_inRangeColliders.Length != 0)
+        if(_inRangeColliders.Length > 0)
         {
 
             for(int i = 0; i < _inRangeColliders.Length; i++)
@@ -55,7 +59,7 @@ public class Detection_Test : MonoBehaviour
             }
 
             Vector3 direction = (targetPlayerPosition - aimPosition.position).normalized;
-            direction.y = Mathf.Clamp(direction.y, -maxVerticleDetection, maxVerticleDetection);
+            //direction.y = Mathf.Clamp(direction.y, -maxVerticleDetection, maxVerticleDetection);
             
             float angle = Vector3.Angle(aimPosition.forward, direction);
             if (_inRangeAngle/2 > angle)

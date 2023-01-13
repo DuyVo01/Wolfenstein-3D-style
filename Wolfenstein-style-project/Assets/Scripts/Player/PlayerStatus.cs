@@ -19,14 +19,15 @@ public class PlayerStatus : MonoBehaviour, IDamagable
     public float health;
     public int lives;
     public static float currentHealth;
-    public static int currentLives = 1;
+    public static int currentLives;
     public static int score;
 
     // Start is called before the first frame update
     void Start()
     {
-        currentWeaponEquipped = null;
         currentHealth = health;
+        currentLives = PlayerPrefs.GetInt("CurrentLives");
+        isWeaponEquipped = false;
     }
 
     public void Damage(float damageAmount)
@@ -37,6 +38,11 @@ public class PlayerStatus : MonoBehaviour, IDamagable
     // Update is called once per frame
     void Update()
     {
+        if (LevelRecord.Instance.IsEndGame)
+        {
+            currentWeaponEquipped = null;
+            isWeaponEquipped = false;
+        }
         if (currentWeaponEquipped != null)
         {
             isWeaponEquipped = true;
@@ -58,6 +64,7 @@ public class PlayerStatus : MonoBehaviour, IDamagable
         if (currentHealth <= 0)
         {
             currentHealth = 0;
+            currentLives--;
             Death();
         }
         if (!audioSource.isPlaying)
@@ -72,12 +79,14 @@ public class PlayerStatus : MonoBehaviour, IDamagable
     {
         isWeaponEquipped = false;
         currentWeaponEquipped = null;
-        SceneManager.LoadScene(1);
+        
+        SceneManager.LoadScene("LevelRecycleScene");
     }
 
     public static void AddScore(int scoretoAdd)
     {
         score += scoretoAdd;
+        LevelRecord.Instance.UpdateScore(score);
     }
 
     public static void Recover(int amountOfHealth)

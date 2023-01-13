@@ -15,6 +15,8 @@ public class EnemyDeathState : BaseEnemyState
         PlayerStatus.AddScore(20);
         enemyStateManager.enemyStatus.isDeath = true;
         enemyStateManager.agent.Stop();
+        LevelRecord.Instance.UpdateEnemyKilled();
+        enemyStateManager.GetComponent<Collider>().enabled = false;
     }
 
     public override void Exit()

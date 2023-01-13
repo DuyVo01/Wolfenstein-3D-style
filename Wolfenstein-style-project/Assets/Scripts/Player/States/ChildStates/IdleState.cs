@@ -11,7 +11,7 @@ public class IdleState : GroundState
     public override void Enter()
     {
         base.Enter();
-        Debug.Log("Enter Idle State");
+        
     }
 
     public override void Exit()

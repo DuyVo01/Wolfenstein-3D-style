@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyShootingState : BaseEnemyState
+public class EnemyShootingState : EnemyCombatState
 {
 
     private List<GameObject> _enemyBullets = new List<GameObject>();
@@ -21,9 +21,10 @@ public class EnemyShootingState : BaseEnemyState
         enemyStateManager.agent.isStopped = true;
         enemyStateManager.agent.enabled = false;
         enemyStateManager.enemyRB.isKinematic = false;
-        Debug.Log("Enemy Shoot Enter");
+        
         _enemyLastFireTime = 0;
         _enemyShootingTime = enemyStateManager.shootingStartTime;
+        _enemyShootingDelayed = enemyStateManager.shootingDelayedTime;
         enemyStateManager.weaponAiming.Aiming();
         if (_enemyBullets.Count == 0)
         {
@@ -50,6 +51,30 @@ public class EnemyShootingState : BaseEnemyState
         }
         else
         {
+            if (_enemyShootingTime > 0.01f)
+            {
+
+                if (Time.time > _enemyLastFireTime + enemyStateManager.enemyFireRate)
+                {
+                    enemyStateManager.enemyAnimator.SetTrigger("Shoot");
+                    enemyStateManager.PlayAudio(enemyStateManager.audioClips[0]);
+                    ShootingBullet();
+                    _enemyLastFireTime = Time.time;
+                }
+                _enemyShootingTime -= Time.deltaTime;
+            }
+            else
+            {
+                if (_enemyShootingDelayed > 0.01f)
+                {
+                    _enemyShootingDelayed -= Time.deltaTime;
+                }
+                else
+                {
+                    _enemyShootingTime = enemyStateManager.shootingStartTime;
+                    _enemyShootingDelayed = enemyStateManager.shootingDelayedTime;
+                }
+            }
             enemyStateManager.RotateToTarget(); 
         }
         
@@ -58,30 +83,7 @@ public class EnemyShootingState : BaseEnemyState
     public override void PhysicalUpdate()
     {
         base.PhysicalUpdate();
-        if(_enemyShootingTime > 0.01f)
-        {
-            
-            if (Time.time > _enemyLastFireTime + enemyStateManager.enemyFireRate)
-            {
-                enemyStateManager.enemyAnimator.SetTrigger("Shoot");
-                enemyStateManager.PlayAudio(enemyStateManager.audioClips[0]);
-                ShootingBullet();
-                _enemyLastFireTime = Time.time;
-            }
-            _enemyShootingTime -= Time.deltaTime;
-        }
-        else
-        {
-            if (_enemyShootingDelayed > 0.01f)
-            {
-                _enemyShootingDelayed -= Time.deltaTime;
-            }
-            else
-            {
-                _enemyShootingTime = enemyStateManager.shootingStartTime;
-                _enemyShootingDelayed = enemyStateManager.shootingDelayedTime;
-            }
-        }  
+          
     }
 
     public override void LateUpdate()

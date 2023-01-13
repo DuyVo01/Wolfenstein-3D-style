@@ -46,7 +46,7 @@ public class AmmoBoxInteracting : MonoBehaviour, IInteractable
         gunManager.currentAmmoHolding = amount;
         EnvironmentObjects.PlayObjectAudio(ammoAudio);
         gameObject.SetActive(false);
-        DisplayNotice.AddText("Ammo + 30");
+        DisplayNotice.AddText("Ammo + " + ammoAmount);
     }
 
 }

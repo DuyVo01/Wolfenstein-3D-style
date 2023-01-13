@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemySearchingState : BaseEnemyState
+public class EnemySearchingState : EnemyCombatState
 {
     private float searchingTime;
     private float searchingPassedTime;
@@ -16,11 +16,7 @@ public class EnemySearchingState : BaseEnemyState
     {
         base.Enter();
         searchingPassedTime = searchingTime;
-        if (enemyStateManager.enemyStatus.isTakingDamage)
-        {
-            enemyStateManager.lastKnownTargetPosition = enemyStateManager.player.position;
-            enemyStateManager.enemyStatus.isTakingDamage = false;
-        }
+      
         enemyStateManager.agent.SetDestination(enemyStateManager.lastKnownTargetPosition);
         enemyStateManager.enemyAnimator.SetBool("Searching", true);
         enemyStateManager.agent.speed = enemyStateManager.agent.speed * 2;
@@ -42,6 +38,7 @@ public class EnemySearchingState : BaseEnemyState
         }
         else
         {
+            Searching();
             enemyStateManager.enemyAnimator.SetFloat("Distance", enemyStateManager.agent.remainingDistance);
             if (enemyStateManager.agent.remainingDistance < 0.01f)
             {
@@ -56,6 +53,16 @@ public class EnemySearchingState : BaseEnemyState
             }
         }
         
+    }
+
+    private void Searching() 
+    {
+        if (enemyStateManager.enemyStatus.isTakingDamage)
+        {
+            enemyStateManager.lastKnownTargetPosition = enemyStateManager.player.position;
+            enemyStateManager.agent.SetDestination(enemyStateManager.lastKnownTargetPosition);
+            enemyStateManager.enemyStatus.isTakingDamage = false;
+        }
     }
 
     public override void PhysicalUpdate()

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GunManager : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class GunManager : MonoBehaviour
     public GameObject bulletBarrel;
     public GameObject bulletPool;
     public Recoil recoil;
+    public Sprite gunImage;
 
     [Space(10)]
 
@@ -66,7 +68,7 @@ public class GunManager : MonoBehaviour
         originalHolderPosition = weaponHolder.transform.localPosition;
 
         currentAmmo = ammoCapacity;
-        currentAmmoHolding = 0;
+        
         for (int i = 0; i < ammoHoldingCapacity; i++)
         {
             GameObject bullet = Instantiate(bulletPrefab, bulletBarrel.transform.position, bulletPrefab.transform.rotation, bulletPool.transform);

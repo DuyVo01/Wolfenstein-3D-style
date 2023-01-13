@@ -9,6 +9,9 @@ TagManager:
   - PlayerHitbox
   - PlayerHurtBox
   - FakeWall
+  - Key
+  - LockDoor
+  - FinalDoor
   layers:
   - Default
   - TransparentFX

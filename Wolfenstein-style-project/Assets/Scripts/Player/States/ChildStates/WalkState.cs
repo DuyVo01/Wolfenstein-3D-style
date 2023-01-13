@@ -13,7 +13,7 @@ public class WalkState : GroundState
     {
         base.Enter();
         ChangeCoroutine(CinemachineNoiseEnable());
-        Debug.Log("Enter Walk State"); 
+        
     }
 
     public override void Exit()

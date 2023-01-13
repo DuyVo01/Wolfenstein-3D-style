@@ -5,22 +5,19 @@ using UnityEngine;
 public class DoorController : MonoBehaviour, IInteractable
 {
     public AudioSource audioSource;
-    public Animator doorAnimator;
     public float timeWaitToClose;
 
     public bool isOpen = false;
-    private Coroutine coroutine = null;
+    protected Coroutine coroutine = null;
 
     public float targetPosX;
-    public float time;
+    public float moveSpeed;
 
-    private Vector3 originalPos;
-    private Vector3 targetPos;
-    public float timePassed;
+    protected Vector3 originalPos;
+    protected Vector3 targetPos;
 
     private void Awake()
     {
-        doorAnimator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
     }
 
@@ -29,15 +26,13 @@ public class DoorController : MonoBehaviour, IInteractable
         originalPos = transform.localPosition;
         targetPos = new Vector3(targetPosX, transform.localPosition.y, transform.localPosition.z);
     }
-    public void OnInteract()
+    public virtual void OnInteract()
     {
-        audioSource.Play();
         isOpen = !isOpen;
         if(coroutine != null)
         {
             StopCoroutine(coroutine);
         }
-        timePassed = 0;
 
         if (isOpen)
         {
@@ -47,39 +42,29 @@ public class DoorController : MonoBehaviour, IInteractable
         {
             coroutine = StartCoroutine(DoorClose());
         }
-
     }
 
 
-
-    public IEnumerator DoorOpen()
+    public virtual IEnumerator DoorOpen()
     {
-        while(timePassed < time)
+        audioSource.Play();
+        while (Vector3.Distance(transform.localPosition, targetPos) > 0.01f)
         {
-            transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, time * Time.deltaTime);
-            timePassed += Time.deltaTime;
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, targetPos, moveSpeed * Time.deltaTime);
             yield return new WaitForEndOfFrame();
         }
-
-        if(Vector3.Distance(transform.localPosition, targetPos) < 0.01f)
-        {
-            coroutine = StartCoroutine(DoorAuto());
-        }
+        yield return new WaitForSeconds(timeWaitToClose);
+        coroutine = StartCoroutine(DoorClose());
     }
 
     public IEnumerator DoorClose()
     {
-        while (timePassed < time)
-        {
-            timePassed += Time.deltaTime;
-            transform.localPosition = Vector3.Lerp(transform.localPosition, originalPos, time * Time.deltaTime);
-            yield return null;
-        }
-    }
-
-    public IEnumerator DoorAuto()
-    {
-        yield return new WaitForSeconds(timeWaitToClose);
+        audioSource.Play();
         isOpen = false;
+        while (Vector3.Distance(transform.localPosition, originalPos) > 0.01f)
+        {
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition, originalPos, moveSpeed * Time.deltaTime);
+            yield return new WaitForEndOfFrame();
+        }
     }
 }

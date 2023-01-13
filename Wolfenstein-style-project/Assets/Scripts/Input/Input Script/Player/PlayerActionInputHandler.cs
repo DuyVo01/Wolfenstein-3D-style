@@ -8,6 +8,7 @@ public class PlayerActionInputHandler : MonoBehaviour
     private bool _isShoot;
     public bool isInteract;
     public bool isReloading;
+    public bool IsPaused { get; set; }
 
     private float _interactingStart;
     public float _interactingTime;
@@ -59,6 +60,14 @@ public class PlayerActionInputHandler : MonoBehaviour
     public bool GetShootInput()
     {
         return _isShoot;
+    }
+
+    public void Paused(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            IsPaused = !IsPaused;
+        }
     }
     
 }

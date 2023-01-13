@@ -5,7 +5,6 @@ using UnityEngine;
 public class FakeWall : MonoBehaviour, IDamagable
 {
     public Animator fakeWallAnimator;
-    public BoxCollider collider;
     private bool isHit;
     // Start is called before the first frame update
     void Start()
